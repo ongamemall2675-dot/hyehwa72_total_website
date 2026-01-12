@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>RAG 지식 관리</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>.spin{animation:s 1s linear infinite}@keyframes s{to{transform:rotate(360deg)}}</style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+<div id="modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+<div class="bg-white rounded-lg p-6 max-w-sm mx-4 text-center">
+<i class="fas fa-cog spin text-4xl text-indigo-600 mb-3"></i>
+<h3 id="m-title" class="font-bold mb-2">처리 중</h3>
+<p id="m-status" class="text-gray-600 text-sm"></p>
+</div></div>
+<nav class="bg-indigo-600 text-white p-4">
+<div class="container mx-auto flex justify-between">
+<h1 class="text-xl font-bold"><i class="fas fa-brain mr-2"></i>RAG 지식 관리</h1>
+<a href="/admin/" class="hover:text-indigo-200"><i class="fas fa-home mr-1"></i>홈</a>
+</div></nav>
+<div class="container mx-auto p-4 max-w-7xl">
+<div class="flex flex-wrap gap-2 mb-4">
+<button onclick="showTab('dashboard')" id="tab-dashboard" class="px-4 py-2 bg-indigo-600 text-white rounded">대시보드</button>
+<button onclick="showTab('upload')" id="tab-upload" class="px-4 py-2 bg-gray-300 rounded">업로드</button>
+<button onclick="showTab('documents')" id="tab-documents" class="px-4 py-2 bg-gray-300 rounded">문서</button>
+<button onclick="showTab('knowledge')" id="tab-knowledge" class="px-4 py-2 bg-gray-300 rounded">지식베이스</button>
+<button onclick="showTab('search')" id="tab-search" class="px-4 py-2 bg-gray-300 rounded">검색</button>
+</div>
+<div id="panel-dashboard" class="space-y-4">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-lg shadow">
+<div class="text-3xl font-bold" id="stat-knowledge">-</div>
+<div class="text-sm opacity-80">총 지식</div></div>
+<div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-4 rounded-lg shadow">
+<div class="text-3xl font-bold" id="stat-docs">-</div>
+<div class="text-sm opacity-80">문서</div></div>
+<div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 rounded-lg shadow">
+<div class="text-3xl font-bold" id="stat-chunks">-</div>
+<div class="text-sm opacity-80">청크</div></div>
+<div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-4 rounded-lg shadow">
+<div class="text-3xl font-bold" id="stat-pending">-</div>
+<div class="text-sm opacity-80">미완료</div></div>
+</div>
+<div class="grid md:grid-cols-2 gap-4">
+<div class="bg-white rounded-lg shadow p-4">
+<h3 class="font-bold mb-3 text-gray-700"><i class="fas fa-layer-group mr-2 text-indigo-600"></i>네임스페이스별 지식</h3>
+<div id="ns-chart" class="space-y-2"></div>
+</div>
+<div class="bg-white rounded-lg shadow p-4">
+<h3 class="font-bold mb-3 text-gray-700"><i class="fas fa-file-alt mr-2 text-green-600"></i>문서 상태</h3>
+<div id="doc-chart" class="space-y-2"></div>
+</div>
+</div>
+<div class="bg-white rounded-lg shadow p-4">
+<div class="flex justify-between items-center mb-3">
+<h3 class="font-bold text-gray-700"><i class="fas fa-exclamation-triangle mr-2 text-orange-500"></i>미완료 문서</h3>
+<button onclick="processAllPending()" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm">전체 처리</button>
+</div>
+<div id="pending-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+</div>
+</div>
+<div id="panel-upload" class="hidden bg-white rounded shadow p-6">
+<h2 class="font-bold mb-4"><i class="fas fa-upload mr-2 text-indigo-600"></i>파일 업로드</h2>
+<div class="flex gap-4 mb-4">
+<select id="upload-ns" class="border rounded p-2">
+<option value="documents">documents</option><option value="n8n-knowledge">n8n-knowledge</option>
+<option value="realestate">realestate</option><option value="shorts">shorts</option>
+</select>
+<input type="text" id="upload-cat" class="border rounded p-2" placeholder="카테고리">
+</div>
+<div id="drop-zone" class="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500">
+<i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i><p>드래그 또는 클릭</p>
+</div>
+<input type="file" id="file-input" class="hidden" multiple>
+<div id="upload-results" class="mt-4"></div>
+</div>
+<div id="panel-documents" class="hidden bg-white rounded shadow p-6">
+<div class="flex justify-between mb-4">
+<h2 class="font-bold"><i class="fas fa-file-alt mr-2 text-indigo-600"></i>문서 관리</h2>
+<button onclick="loadDocuments()" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm">새로고침</button>
+</div>
+<div class="text-xs text-gray-500 mb-2">AI: 청킹=Gemini 2.0 Flash | 임베딩=text-embedding-004</div>
+<div id="documents-list" class="space-y-2"></div>
+</div>
+<div id="panel-knowledge" class="hidden bg-white rounded shadow p-6">
+<h2 class="font-bold mb-4"><i class="fas fa-database mr-2 text-indigo-600"></i>지식베이스</h2>
+<select id="kb-namespace" class="border p-2 mb-4" onchange="loadKnowledgeItems()"><option value="">선택</option></select>
+<div id="knowledge-items" class="space-y-2 max-h-96 overflow-y-auto"></div>
+</div>
+<div id="panel-search" class="hidden bg-white rounded shadow p-6">
+<h2 class="font-bold mb-4"><i class="fas fa-search mr-2 text-indigo-600"></i>검색</h2>
+<div class="flex gap-2 mb-4">
+<input type="text" id="search-query" class="flex-1 border p-2 rounded" placeholder="검색어">
+<select id="search-namespace" class="border p-2 rounded"></select>
+<button onclick="doSearch()" class="bg-indigo-600 text-white px-4 rounded">검색</button>
+</div>
+<div id="search-results"></div>
+</div>
+</div>
+<script>
+const API='https://api.hyehwa72.org/api/rag';
+function showModal(t,s){document.getElementById('m-title').textContent=t;document.getElementById('m-status').textContent=s;document.getElementById('modal').classList.remove('hidden');}
+function hideModal(){document.getElementById('modal').classList.add('hidden');}
+function showTab(t){
+document.querySelectorAll('[id^=panel-]').forEach(p=>p.classList.add('hidden'));
+document.querySelectorAll('[id^=tab-]').forEach(b=>{b.classList.remove('bg-indigo-600','text-white');b.classList.add('bg-gray-300');});
+document.getElementById('panel-'+t).classList.remove('hidden');
+var b=document.getElementById('tab-'+t);b.classList.remove('bg-gray-300');b.classList.add('bg-indigo-600','text-white');
+if(t==='dashboard')loadDashboard();if(t==='knowledge')loadNamespaces();if(t==='documents')loadDocuments();
+}
+async function loadDashboard(){
+try{
+var r=await fetch(API+'/dashboard/stats');var d=await r.json();
+document.getElementById('stat-knowledge').textContent=d.totals.knowledge;
+document.getElementById('stat-docs').textContent=d.totals.docs;
+document.getElementById('stat-chunks').textContent=d.totals.chunks;
+document.getElementById('stat-pending').textContent=d.pending.length;
+var maxNs=Math.max(...d.ns_stats.map(x=>x.count));
+var h1='';d.ns_stats.forEach(x=>{
+var w=Math.round(x.count/maxNs*100);
+h1+='<div class="flex items-center gap-2"><span class="w-28 text-sm truncate">'+x.namespace+'</span>';
+h1+='<div class="flex-1 bg-gray-200 rounded h-6"><div class="bg-indigo-500 h-6 rounded" style="width:'+w+'%"></div></div>';
+h1+='<span class="w-12 text-right text-sm font-bold">'+x.count+'</span></div>';
+});
+document.getElementById('ns-chart').innerHTML=h1||'<div class="text-gray-500">데이터 없음</div>';
+var sc={uploaded:'bg-yellow-500',chunked:'bg-blue-500',embedded:'bg-green-500'};
+var h2='';d.doc_stats.forEach(x=>{
+h2+='<div class="flex items-center gap-2"><span class="w-20 text-sm">'+x.status+'</span>';
+h2+='<div class="flex-1 bg-gray-200 rounded h-6"><div class="'+(sc[x.status]||'bg-gray-500')+' h-6 rounded" style="width:'+Math.min(x.count*20,100)+'%"></div></div>';
+h2+='<span class="w-8 text-right font-bold">'+x.count+'</span></div>';
+});
+document.getElementById('doc-chart').innerHTML=h2||'문서 없음';
+var h3='';d.pending.forEach(x=>{
+h3+='<div class="flex justify-between bg-orange-50 p-2 rounded"><span>'+x.original_filename+' ('+x.status+')</span>';
+h3+='<button onclick="processDoc('+x.id+')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs">처리</button></div>';
+});
+document.getElementById('pending-list').innerHTML=h3||'<div class="text-green-600 text-center py-4">모두 완료!</div>';
+}catch(e){console.error(e);}
+}
+var dz=document.getElementById('drop-zone'),fi=document.getElementById('file-input');
+dz.onclick=function(){fi.click();};
+dz.ondragover=function(e){e.preventDefault();dz.classList.add('border-indigo-500');};
+dz.ondragleave=function(e){e.preventDefault();dz.classList.remove('border-indigo-500');};
+dz.ondrop=function(e){e.preventDefault();if(e.dataTransfer.files.length)uploadFiles(e.dataTransfer.files);};
+fi.onchange=function(){if(fi.files.length)uploadFiles(fi.files);};
+async function uploadFiles(files){
+var ns=document.getElementById('upload-ns').value,rd=document.getElementById('upload-results');rd.innerHTML='';
+for(var f of files){showModal('업로드',f.name);
+var fd=new FormData();fd.append('file',f);fd.append('namespace',ns);
+var r=await fetch(API+'/upload',{method:'POST',body:fd});var d=await r.json();
+rd.innerHTML+='<div class="bg-green-100 p-2 rounded">'+f.name+'</div>';}
+hideModal();fi.value='';loadDashboard();
+}
+async function processDoc(id){
+showModal('청킹','Gemini로 분할 중...');
+var r1=await fetch(API+'/documents/'+id+'/chunk',{method:'POST'});var d1=await r1.json();
+if(!d1.success){hideModal();alert('청킹 실패');return;}
+showModal('임베딩','벡터 변환 중...');
+var r2=await fetch(API+'/documents/'+id+'/embed',{method:'POST'});var d2=await r2.json();
+hideModal();alert(d2.success?'완료!':'임베딩 실패');loadDashboard();loadDocuments();
+}
+async function processAllPending(){
+if(!confirm('미완료 문서를 모두 처리할까요?'))return;
+var r=await fetch(API+'/dashboard/stats');var d=await r.json();
+for(var doc of d.pending){await processDoc(doc.id);}
+}
+async function chunkDoc(id){showModal('청킹','');await fetch(API+'/documents/'+id+'/chunk',{method:'POST'});hideModal();loadDocuments();}
+async function embedDoc(id){showModal('임베딩','');await fetch(API+'/documents/'+id+'/embed',{method:'POST'});hideModal();loadDocuments();}
+async function deleteDoc(id){if(confirm('삭제?')){await fetch(API+'/documents/'+id,{method:'DELETE'});loadDocuments();loadDashboard();}}
+async function loadDocuments(){
+var r=await fetch(API+'/documents');var d=await r.json();var h='';
+d.documents.forEach(x=>{h+='<div class="bg-gray-50 p-2 rounded flex justify-between"><span>'+x.original_filename+'</span><span>';
+if(x.status!='embedded')h+='<button onclick="processDoc('+x.id+')" class="text-indigo-600 mr-2">처리</button>';
+h+='<button onclick="deleteDoc('+x.id+')" class="text-red-500">삭제</button></span></div>';});
+document.getElementById('documents-list').innerHTML=h||'없음';
+}
+async function loadNamespaces(){
+var r=await fetch(API+'/namespaces');var d=await r.json();var o='<option value="">선택</option>';
+d.namespaces.forEach(x=>{o+='<option value="'+x.namespace+'">'+x.namespace+' ('+x.count+')</option>';});
+document.getElementById('kb-namespace').innerHTML=o;
+document.getElementById('search-namespace').innerHTML=o;
+}
+async function loadKnowledgeItems(){
+var ns=document.getElementById('kb-namespace').value;if(!ns)return;
+var r=await fetch(API+'/list/'+ns);var d=await r.json();var h='';
+d.items.forEach(i=>{h+='<div class="bg-gray-50 p-2 rounded flex justify-between"><span class="truncate">'+i.title+'</span>';
+h+='<button onclick="deleteKB('+i.id+')" class="text-red-500 text-sm">삭제</button></div>';});
+document.getElementById('knowledge-items').innerHTML=h||'없음';
+}
+async function deleteKB(id){if(confirm('삭제?')){await fetch(API+'/'+id,{method:'DELETE'});loadKnowledgeItems();loadNamespaces();loadDashboard();}}
+async function doSearch(){
+var q=document.getElementById('search-query').value,ns=document.getElementById('search-namespace').value;
+if(!q){alert('검색어');return;}showModal('검색','');
+var r=await fetch(API+'/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,namespace:ns,top_k:5})});
+var d=await r.json();hideModal();var h='';
+d.results.forEach((x,i)=>{h+='<div class="bg-gray-50 p-3 rounded mb-2"><b>#'+(i+1)+' '+x.title+'</b> ('+(x.similarity*100).toFixed(1)+'%)<br><span class="text-sm text-gray-600">'+x.content.substring(0,200)+'...</span></div>';});
+document.getElementById('search-results').innerHTML=h||'없음';
+}
+loadDashboard();loadNamespaces();
+</script></body></html>

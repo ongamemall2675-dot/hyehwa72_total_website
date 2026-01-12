@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG 지식 창고 - 혜화72</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{--primary:#22c55e;--primary-dark:#16a34a;--bg-dark:#0f172a;--bg-card:#1e293b;--text-primary:#f8fafc;--text-muted:#94a3b8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);min-height:100vh;color:var(--text-primary)}
+.container-fluid{max-width:1400px;margin:0 auto;padding:30px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+.back-btn{display:flex;align-items:center;gap:8px;color:var(--text-muted);text-decoration:none}
+.back-btn:hover{color:#fff}
+.page-title{display:flex;align-items:center;gap:12px;font-size:1.5rem;font-weight:700}
+.title-icon{width:48px;height:48px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.status-badge{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:20px;font-size:.85rem}
+.status-badge.online{background:rgba(34,197,94,.2);color:#22c55e}
+.status-badge.offline{background:rgba(239,68,68,.2);color:#ef4444}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px}
+.stat-card{background:var(--bg-card);border-radius:12px;padding:20px;text-align:center}
+.stat-value{font-size:2rem;font-weight:700;color:var(--primary)}
+.stat-label{font-size:.85rem;color:var(--text-muted);margin-top:4px}
+.main-grid{display:grid;grid-template-columns:1fr 400px;gap:24px}
+.card{background:var(--bg-card);border-radius:16px;border:none}
+.card-header{background:none;border-bottom:1px solid #334155;padding:20px 24px;font-weight:600;display:flex;align-items:center;justify-content:space-between;color:var(--text-primary)}
+.card-header-left{display:flex;align-items:center;gap:10px}
+.card-header i{color:var(--primary)}
+.card-body{padding:24px}
+.search-box{display:flex;gap:12px;margin-bottom:20px}
+.search-input{flex:1;background:#0f172a;border:1px solid #334155;color:#fff;border-radius:10px;padding:12px 16px}
+.search-input:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px rgba(34,197,94,.2)}
+.search-input::placeholder{color:#64748b}
+.btn-search{background:var(--primary);border:none;color:#fff;padding:12px 20px;border-radius:10px;display:flex;align-items:center;gap:8px}
+.btn-search:hover{background:var(--primary-dark);color:#fff}
+.filter-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.filter-tab{background:#334155;border:none;color:var(--text-muted);padding:8px 16px;border-radius:20px;font-size:.85rem;cursor:pointer}
+.filter-tab:hover,.filter-tab.active{background:var(--primary);color:#fff}
+.doc-list{max-height:500px;overflow-y:auto}
+.doc-item{background:#0f172a;border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s;border:1px solid transparent}
+.doc-item:hover{border-color:var(--primary);transform:translateX(4px)}
+.doc-item.selected{border-color:var(--primary);background:rgba(34,197,94,.1)}
+.doc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.doc-type{background:rgba(34,197,94,.2);color:var(--primary);padding:2px 10px;border-radius:10px;font-size:.75rem;font-weight:500}
+.doc-date{font-size:.75rem;color:var(--text-muted)}
+.doc-title{font-weight:600;margin-bottom:6px;font-size:.95rem}
+.doc-preview{font-size:.85rem;color:var(--text-muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.doc-meta{display:flex;gap:12px;margin-top:10px;font-size:.75rem;color:var(--text-muted)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.empty-state i{font-size:4rem;margin-bottom:16px;opacity:.3}
+.form-label{color:var(--text-muted);font-size:.9rem;margin-bottom:8px}
+.form-control,.form-select{background:#0f172a;border:1px solid #334155;color:#fff;border-radius:10px;padding:12px 16px}
+.form-control:focus,.form-select:focus{background:#0f172a;border-color:var(--primary);color:#fff;box-shadow:0 0 0 3px rgba(34,197,94,.2)}
+.form-control::placeholder{color:#64748b}
+.btn-save{background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;padding:14px 28px;border-radius:12px;font-weight:600;width:100%;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-save:hover{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff}
+.detail-panel{display:none}
+.detail-panel.active{display:block}
+.detail-content{background:#0f172a;border-radius:12px;padding:20px;white-space:pre-wrap;line-height:1.8;font-size:.9rem;max-height:300px;overflow-y:auto}
+.detail-actions{display:flex;gap:12px;margin-top:16px}
+.btn-action{flex:1;background:#334155;border:none;color:#fff;padding:12px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:.9rem}
+.btn-action:hover{background:#475569;color:#fff}
+.btn-action.danger{background:#dc2626}
+.btn-action.danger:hover{background:#b91c1c}
+.api-info{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin-top:20px}
+.api-info-title{color:var(--primary);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px;font-size:.9rem}
+.api-info code{background:#0f172a;padding:2px 8px;border-radius:4px;font-size:.8rem}
+@media(max-width:1200px){.main-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.stats-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container-fluid">
+<header class="header">
+<a href="portal.html" class="back-btn"><i class="bi bi-arrow-left"></i> 포털로 돌아가기</a>
+<div class="page-title"><div class="title-icon"><i class="bi bi-database"></i></div>RAG 지식 창고</div>
+<div class="status-badge" id="serverStatus"><i class="bi bi-circle-fill"></i> 연결 확인중...</div>
+</header>
+
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-value" id="totalDocs">-</div><div class="stat-label">전체 문서</div></div>
+<div class="stat-card"><div class="stat-value" id="scriptDocs">-</div><div class="stat-label">대본</div></div>
+<div class="stat-card"><div class="stat-value" id="knowledgeDocs">-</div><div class="stat-label">지식문서</div></div>
+<div class="stat-card"><div class="stat-value" id="todayDocs">-</div><div class="stat-label">오늘 추가</div></div>
+</div>
+
+<div class="main-grid">
+<div class="card">
+<div class="card-header">
+<div class="card-header-left"><i class="bi bi-folder2-open"></i> 저장된 문서</div>
+<button class="btn-search" onclick="loadDocuments()"><i class="bi bi-arrow-clockwise"></i> 새로고침</button>
+</div>
+<div class="card-body">
+<div class="search-box">
+<input type="text" class="search-input" id="searchQuery" placeholder="문서 검색 (유사도 기반)...">
+<button class="btn-search" onclick="searchDocuments()"><i class="bi bi-search"></i> 검색</button>
+</div>
+<div class="filter-tabs">
+<button class="filter-tab active" data-filter="all" onclick="filterDocs('all')">전체</button>
+<button class="filter-tab" data-filter="economy" onclick="filterDocs('economy')">경제</button>
+<button class="filter-tab" data-filter="senior" onclick="filterDocs('senior')">시니어</button>
+<button class="filter-tab" data-filter="martial" onclick="filterDocs('martial')">무협</button>
+<button class="filter-tab" data-filter="horror" onclick="filterDocs('horror')">괴담</button>
+<button class="filter-tab" data-filter="knowledge" onclick="filterDocs('knowledge')">지식</button>
+</div>
+<div class="doc-list" id="docList">
+<div class="empty-state"><i class="bi bi-inbox"></i><p>문서를 불러오는 중...</p></div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header"><div class="card-header-left"><i class="bi bi-plus-circle"></i> 새 문서 추가</div></div>
+<div class="card-body" id="addPanel">
+<div class="mb-3"><label class="form-label">문서 유형</label>
+<select class="form-select" id="docType">
+<option value="economy">경제 대본</option>
+<option value="senior">시니어 건강</option>
+<option value="martial">무협 스토리</option>
+<option value="horror">야담/괴담</option>
+<option value="knowledge">지식 문서</option>
+<option value="other">기타</option>
+</select></div>
+<div class="mb-3"><label class="form-label">제목/주제</label>
+<input type="text" class="form-control" id="docTitle" placeholder="문서 제목을 입력하세요"></div>
+<div class="mb-3"><label class="form-label">내용</label>
+<textarea class="form-control" id="docContent" rows="8" placeholder="문서 내용을 입력하세요..."></textarea></div>
+<div class="mb-3"><label class="form-label">태그 (쉼표로 구분)</label>
+<input type="text" class="form-control" id="docTags" placeholder="예: 금리, 투자, 2024"></div>
+<button class="btn-save" onclick="saveDocument()"><i class="bi bi-cloud-upload"></i> RAG 서버에 저장</button>
+<div class="api-info">
+<div class="api-info-title"><i class="bi bi-info-circle"></i> API 엔드포인트</div>
+<p style="font-size:.8rem;color:var(--text-muted);margin:0">
+<code>GET /scripts</code> 목록 조회<br>
+<code>POST /scripts</code> 문서 저장<br>
+<code>POST /search</code> 유사 검색<br>
+<a href="https://rag.hyehwa72.org/docs" target="_blank" style="color:var(--primary)">API 문서 보기 →</a>
+</p>
+</div>
+</div>
+
+<div class="card-body detail-panel" id="detailPanel">
+<div class="mb-3">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<span class="doc-type" id="detailType">경제</span>
+<span class="doc-date" id="detailDate">2024-01-08</span>
+</div>
+<h5 id="detailTitle" style="margin-bottom:16px">문서 제목</h5>
+</div>
+<div class="detail-content" id="detailContent">문서 내용이 여기에 표시됩니다.</div>
+<div class="detail-actions">
+<button class="btn-action" onclick="copyDocument()"><i class="bi bi-clipboard"></i> 복사</button>
+<button class="btn-action" onclick="downloadDocument()"><i class="bi bi-download"></i> 다운로드</button>
+<button class="btn-action" onclick="showAddPanel()"><i class="bi bi-arrow-left"></i> 돌아가기</button>
+<button class="btn-action danger" onclick="deleteDocument()"><i class="bi bi-trash"></i> 삭제</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+const API_BASE='https://rag.hyehwa72.org';
+let documents=[];
+let selectedDoc=null;
+let currentFilter='all';
+
+async function checkServer(){
+const badge=document.getElementById('serverStatus');
+try{
+const r=await fetch(API_BASE+'/health',{method:'GET',mode:'cors'});
+if(r.ok){badge.className='status-badge online';badge.innerHTML='<i class="bi bi-circle-fill"></i> 서버 정상'}
+else throw new Error();
+}catch(e){
+try{const r2=await fetch(API_BASE+'/scripts');
+if(r2.ok){badge.className='status-badge online';badge.innerHTML='<i class="bi bi-circle-fill"></i> 서버 정상'}
+else throw new Error();
+}catch(e2){badge.className='status-badge offline';badge.innerHTML='<i class="bi bi-circle-fill"></i> 서버 오프라인'}
+}}
+
+async function loadDocuments(){
+document.getElementById('docList').innerHTML='<div class="empty-state"><i class="bi bi-hourglass-split"></i><p>문서를 불러오는 중...</p></div>';
+try{
+const r=await fetch(API_BASE+'/scripts');
+if(r.ok){
+documents=await r.json();
+updateStats();
+renderDocuments();
+}else throw new Error('Failed to load');
+}catch(e){
+documents=[];
+document.getElementById('docList').innerHTML='<div class="empty-state"><i class="bi bi-exclamation-triangle"></i><p>서버에 연결할 수 없습니다<br><small>RAG 서버 상태를 확인해주세요</small></p></div>';
+updateStats();
+}}
+
+function updateStats(){
+const total=documents.length;
+const scripts=documents.filter(d=>['economy','senior','martial','horror'].includes(d.metadata?.type)).length;
+const knowledge=documents.filter(d=>d.metadata?.type==='knowledge').length;
+const today=documents.filter(d=>{
+const created=d.metadata?.created||d.created_at;
+if(!created)return false;
+return new Date(created).toDateString()===new Date().toDateString();
+}).length;
+document.getElementById('totalDocs').textContent=total;
+document.getElementById('scriptDocs').textContent=scripts;
+document.getElementById('knowledgeDocs').textContent=knowledge;
+document.getElementById('todayDocs').textContent=today;
+}
+
+function renderDocuments(){
+const filtered=currentFilter==='all'?documents:documents.filter(d=>d.metadata?.type===currentFilter);
+if(filtered.length===0){
+document.getElementById('docList').innerHTML='<div class="empty-state"><i class="bi bi-inbox"></i><p>저장된 문서가 없습니다</p></div>';
+return;
+}
+document.getElementById('docList').innerHTML=filtered.map((d,i)=>{
+const type=d.metadata?.type||'other';
+const title=d.metadata?.topic||d.metadata?.title||'제목 없음';
+const preview=(d.content||'').substring(0,100);
+const date=d.metadata?.created?new Date(d.metadata.created).toLocaleDateString('ko-KR'):'-';
+const typeLabels={economy:'경제',senior:'시니어',martial:'무협',horror:'괴담',knowledge:'지식',other:'기타'};
+return `<div class="doc-item" onclick="selectDocument(${i})">
+<div class="doc-header"><span class="doc-type">${typeLabels[type]||type}</span><span class="doc-date">${date}</span></div>
+<div class="doc-title">${title}</div>
+<div class="doc-preview">${preview}...</div>
+<div class="doc-meta"><span><i class="bi bi-file-text"></i> ${(d.content||'').length}자</span></div>
+</div>`;
+}).join('');
+}
+
+function filterDocs(filter){
+currentFilter=filter;
+document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+document.querySelector(`.filter-tab[data-filter="${filter}"]`).classList.add('active');
+renderDocuments();
+}
+
+async function searchDocuments(){
+const query=document.getElementById('searchQuery').value.trim();
+if(!query){loadDocuments();return;}
+document.getElementById('docList').innerHTML='<div class="empty-state"><i class="bi bi-search"></i><p>검색 중...</p></div>';
+try{
+const r=await fetch(API_BASE+'/search',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({query:query,top_k:10})
+});
+if(r.ok){
+const results=await r.json();
+documents=results.map(r=>({content:r.content,metadata:r.metadata,score:r.score}));
+renderDocuments();
+}else throw new Error();
+}catch(e){
+document.getElementById('docList').innerHTML='<div class="empty-state"><i class="bi bi-exclamation-triangle"></i><p>검색에 실패했습니다</p></div>';
+}}
+
+function selectDocument(index){
+const filtered=currentFilter==='all'?documents:documents.filter(d=>d.metadata?.type===currentFilter);
+selectedDoc=filtered[index];
+document.querySelectorAll('.doc-item').forEach((el,i)=>el.classList.toggle('selected',i===index));
+const typeLabels={economy:'경제',senior:'시니어',martial:'무협',horror:'괴담',knowledge:'지식',other:'기타'};
+document.getElementById('detailType').textContent=typeLabels[selectedDoc.metadata?.type]||'기타';
+document.getElementById('detailDate').textContent=selectedDoc.metadata?.created?new Date(selectedDoc.metadata.created).toLocaleDateString('ko-KR'):'-';
+document.getElementById('detailTitle').textContent=selectedDoc.metadata?.topic||selectedDoc.metadata?.title||'제목 없음';
+document.getElementById('detailContent').textContent=selectedDoc.content||'내용 없음';
+document.getElementById('addPanel').style.display='none';
+document.getElementById('detailPanel').classList.add('active');
+}
+
+function showAddPanel(){
+selectedDoc=null;
+document.querySelectorAll('.doc-item').forEach(el=>el.classList.remove('selected'));
+document.getElementById('addPanel').style.display='block';
+document.getElementById('detailPanel').classList.remove('active');
+}
+
+async function saveDocument(){
+const type=document.getElementById('docType').value;
+const title=document.getElementById('docTitle').value.trim();
+const content=document.getElementById('docContent').value.trim();
+const tags=document.getElementById('docTags').value.trim();
+if(!content){alert('내용을 입력해주세요!');return;}
+try{
+const r=await fetch(API_BASE+'/scripts',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+content:content,
+metadata:{
+type:type,
+topic:title||'제목 없음',
+tags:tags?tags.split(',').map(t=>t.trim()):[],
+created:new Date().toISOString()
+}
+})
+});
+if(r.ok){
+alert('저장되었습니다!');
+document.getElementById('docTitle').value='';
+document.getElementById('docContent').value='';
+document.getElementById('docTags').value='';
+loadDocuments();
+}else{
+const err=await r.json();
+throw new Error(err.detail||'저장 실패');
+}
+}catch(e){alert('저장에 실패했습니다: '+e.message);}}
+
+function copyDocument(){
+if(!selectedDoc)return;
+navigator.clipboard.writeText(selectedDoc.content||'');
+alert('클립보드에 복사되었습니다!');
+}
+
+function downloadDocument(){
+if(!selectedDoc)return;
+const title=selectedDoc.metadata?.topic||'document';
+const blob=new Blob([selectedDoc.content||''],{type:'text/plain'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download=`${title}.txt`;a.click();
+}
+
+async function deleteDocument(){
+if(!selectedDoc)return;
+if(!confirm('정말 삭제하시겠습니까?'))return;
+const id=selectedDoc.id||selectedDoc.metadata?.id;
+if(!id){alert('문서 ID를 찾을 수 없습니다');return;}
+try{
+const r=await fetch(API_BASE+'/scripts/'+id,{method:'DELETE'});
+if(r.ok){
+alert('삭제되었습니다!');
+showAddPanel();
+loadDocuments();
+}else throw new Error();
+}catch(e){alert('삭제에 실패했습니다. API가 DELETE를 지원하는지 확인해주세요.');}}
+
+checkServer();
+loadDocuments();
+</script>
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대시보드 - 혜화72 부동산</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #1e1e2d;
+            --sidebar-hover: #2d2d3f;
+            --primary: #5c6bc0;
+            --primary-dark: #4a5ab9;
+            --text-muted: #a2a5b9;
+        }
+
+        * {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-brand-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-brand h5 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .sidebar-brand small {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .sidebar-nav {
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--sidebar-hover);
+            color: #fff;
+            border-left: 3px solid var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--sidebar-bg);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: #fff;
+            padding: 15px 25px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-card h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 10px 0 5px;
+        }
+
+        .stat-card p {
+            color: #6c757d;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* Quick Menu */
+        .quick-menu-item {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+        }
+
+        .quick-menu-item:hover {
+            transform: translateY(-3px);
+            color: var(--primary);
+            box-shadow: 0 4px 15px rgba(92, 107, 192, 0.2);
+        }
+
+        .quick-menu-item i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .quick-menu-item span {
+            display: block;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        /* Activity & Schedule */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            font-weight: 600;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .schedule-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--primary);
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon"><i class="bi bi-building"></i></div>
+            <div>
+                <h5>혜화72</h5>
+                <small>부동산 관리시스템</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item active"><i class="bi bi-grid-1x2"></i> 대시보드</a>
+            <a href="ledger.html" class="nav-item"><i class="bi bi-journal-text"></i> 부동산 원장</a>
+            <a href="properties.html" class="nav-item"><i class="bi bi-building"></i> 매물 관리</a>
+            <a href="customers.html" class="nav-item"><i class="bi bi-people"></i> 고객 관리</a>
+            <a href="requests.html" class="nav-item"><i class="bi bi-clipboard-check"></i> 의뢰 관리</a>
+            <a href="contracts.html" class="nav-item"><i class="bi bi-file-earmark-text"></i> 계약 관리</a>
+            <a href="schedules.html" class="nav-item"><i class="bi bi-calendar3"></i> 일정 관리</a>
+            <a href="settings.html" class="nav-item"><i class="bi bi-gear"></i> 설정</a>
+            <a href="rag.html" class="nav-item"><i class="bi bi-braces-asterisk"></i> RAG 지식관리</a>
+            <a href="content-studio.html" class="nav-item"><i class="bi bi-robot"></i> AI 부동산 에이전트</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar"><i class="bi bi-person"></i></div>
+                <div>
+                    <div style="font-weight: 600;">김훈</div>
+                    <small style="color: var(--text-muted);">대학로혜화72</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="매물, 고객, 계약 검색...">
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-light position-relative">
+                    <i class="bi bi-bell"></i>
+                    <span
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
+                </button>
+                <span class="text-muted" id="currentDate"></span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Stats -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p>전체 매물</p>
+                                <h2>13</h2>
+                                <small class="text-success"><i class="bi bi-arrow-up"></i> 활성 8건</small>
+                            </div>
+                            <div class="icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-building"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p>진행 의뢰</p>
+                                <h2>5</h2>
+                                <small class="text-warning"><i class="bi bi-clock"></i> 대기 2건</small>
+                            </div>
+                            <div class="icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-clipboard-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p>이번 달 계약</p>
+                                <h2>3</h2>
+                                <small class="text-info"><i class="bi bi-graph-up"></i> 전월 대비 +50%</small>
+                            </div>
+                            <div class="icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-file-earmark-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p>전체 고객</p>
+                                <h2>2</h2>
+                                <small class="text-primary"><i class="bi bi-person-plus"></i> VIP 1명</small>
+                            </div>
+                            <div class="icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-people"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Menu -->
+            <h6 class="text-muted mb-3"><i class="bi bi-lightning"></i> 빠른 메뉴</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="property-add.html" class="quick-menu-item d-block">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>매물 등록</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="customers.html?action=add" class="quick-menu-item d-block">
+                        <i class="bi bi-person-plus"></i>
+                        <span>고객 등록</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="requests.html?action=add" class="quick-menu-item d-block">
+                        <i class="bi bi-clipboard-plus"></i>
+                        <span>의뢰 접수</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="contracts.html?action=add" class="quick-menu-item d-block">
+                        <i class="bi bi-file-earmark-plus"></i>
+                        <span>계약 작성</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="schedules.html?action=add" class="quick-menu-item d-block">
+                        <i class="bi bi-calendar-plus"></i>
+                        <span>일정 등록</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="ledger.html" class="quick-menu-item d-block">
+                        <i class="bi bi-journal-text"></i>
+                        <span>원장 보기</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Activity & Schedule -->
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center py-3">
+                            <span><i class="bi bi-activity me-2"></i>최근 활동</span>
+                            <a href="#" class="text-primary text-decoration-none small">전체보기</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-item">
+                                <div class="activity-icon bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-building"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-medium">새 매물 등록</div>
+                                    <small class="text-muted">종로구 혜화동 아파트 84㎡ 전세</small>
+                                    <div class="text-muted small mt-1">10분 전</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon bg-primary bg-opacity-10 text-primary">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-medium">고객 문의</div>
+                                    <small class="text-muted">김철수님 - 대학로 원룸 문의</small>
+                                    <div class="text-muted small mt-1">30분 전</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon bg-warning bg-opacity-10 text-warning">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-medium">계약 완료</div>
+                                    <small class="text-muted">성북구 동소문로 빌라 월세 계약</small>
+                                    <div class="text-muted small mt-1">2시간 전</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon bg-info bg-opacity-10 text-info">
+                                    <i class="bi bi-clipboard-check"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-medium">의뢰 매칭</div>
+                                    <small class="text-muted">박영희님 의뢰에 3건 매물 매칭</small>
+                                    <div class="text-muted small mt-1">3시간 전</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center py-3">
+                            <span><i class="bi bi-calendar3 me-2"></i>오늘 일정</span>
+                            <a href="schedules.html" class="text-primary text-decoration-none small">전체보기</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="schedule-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="fw-medium">매물 현장 방문</div>
+                                    <span class="badge bg-primary">10:00</span>
+                                </div>
+                                <small class="text-muted">혜화동 아파트 84㎡</small>
+                            </div>
+                            <div class="schedule-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="fw-medium">고객 미팅</div>
+                                    <span class="badge bg-success">14:00</span>
+                                </div>
+                                <small class="text-muted">김철수님 - 전세 상담</small>
+                            </div>
+                            <div class="schedule-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="fw-medium">계약서 작성</div>
+                                    <span class="badge bg-warning text-dark">16:00</span>
+                                </div>
+                                <small class="text-muted">동소문로 빌라 월세</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ko-KR', {
+            year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+        });
+    </script>
+</body>
+
+</html>

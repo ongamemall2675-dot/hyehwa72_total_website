@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL 경로 도우미 - Hyehwa72</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --success: #10b981;
+            --border: #475569;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        h1 i { color: var(--accent); }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+        
+        .back-btn:hover { background: var(--bg-tertiary); }
+        
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card h2 i { color: var(--accent); font-size: 1rem; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        td { color: var(--text-primary); }
+        
+        .path-cell { font-family: monospace; color: var(--success); }
+        
+        .converter {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+        
+        select, input[type="text"] {
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            outline: none;
+        }
+        
+        select:focus, input:focus {
+            border-color: var(--accent);
+        }
+        
+        select { min-width: 150px; }
+        input[type="text"] { flex: 1; min-width: 200px; }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover { background: var(--accent-hover); }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+        }
+        
+        .btn-secondary:hover { background: var(--border); }
+        
+        .result {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .result.show { display: block; }
+        
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .result-row:last-child { border-bottom: none; }
+        
+        .result-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .result-value {
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: var(--success);
+            word-break: break-all;
+        }
+        
+        .copy-btn {
+            padding: 0.25rem 0.5rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        
+        .copy-btn.copied {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+        
+        .tips {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .tips ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .tips li { margin-bottom: 0.25rem; }
+        
+        .tips code {
+            background: var(--bg-tertiary);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        @media (max-width: 640px) {
+            body { padding: 1rem; }
+            .input-group { flex-direction: column; }
+            select, input[type="text"] { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="bi bi-link-45deg"></i> URL 경로 도우미</h1>
+            <a href="content-studio.html" class="back-btn">
+                <i class="bi bi-arrow-left"></i> Content Studio
+            </a>
+        </header>
+        
+        <!-- 경로 매핑 테이블 -->
+        <div class="card">
+            <h2><i class="bi bi-folder2-open"></i> 디렉토리 → URL 매핑</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>카테고리</th>
+                        <th>서버 경로</th>
+                        <th>URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>메인</td>
+                        <td class="path-cell">/root/realhun-app/frontend/admin/</td>
+                        <td class="path-cell">https://admin.hyehwa72.org/</td>
+                    </tr>
+                    <tr>
+                        <td>웹훅</td>
+                        <td class="path-cell">/root/realhun-app/frontend/admin/webhooks/</td>
+                        <td class="path-cell">https://admin.hyehwa72.org/webhooks/</td>
+                    </tr>
+                    <tr>
+                        <td>AI 도구</td>
+                        <td class="path-cell">/root/realhun-app/frontend/admin/tools/</td>
+                        <td class="path-cell">https://admin.hyehwa72.org/tools/</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- URL 변환기 -->
+        <div class="card">
+            <h2><i class="bi bi-arrow-left-right"></i> URL 변환기</h2>
+            <div class="converter">
+                <div class="input-group">
+                    <div>
+                        <label>카테고리</label>
+                        <select id="category">
+                            <option value="">메인 (루트)</option>
+                            <option value="webhooks/">웹훅 연동</option>
+                            <option value="tools/">AI 도구</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label>파일명 (.html 자동 추가)</label>
+                        <input type="text" id="filename" placeholder="예: my-form">
+                    </div>
+                    <div style="align-self: flex-end;">
+                        <button class="btn" onclick="convertUrl()">
+                            <i class="bi bi-arrow-repeat"></i> 변환
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="result" id="result">
+                    <div class="result-row">
+                        <div>
+                            <div class="result-label">브라우저 URL</div>
+                            <div class="result-value" id="resultUrl"></div>
+                        </div>
+                        <button class="copy-btn" onclick="copyText('resultUrl', this)">
+                            <i class="bi bi-clipboard"></i> 복사
+                        </button>
+                    </div>
+                    <div class="result-row">
+                        <div>
+                            <div class="result-label">서버 경로 (업로드용)</div>
+                            <div class="result-value" id="resultPath"></div>
+                        </div>
+                        <button class="copy-btn" onclick="copyText('resultPath', this)">
+                            <i class="bi bi-clipboard"></i> 복사
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 사용 팁 -->
+        <div class="card">
+            <h2><i class="bi bi-lightbulb"></i> 사용 팁</h2>
+            <div class="tips">
+                <ul>
+                    <li><strong>메인</strong>: Content Studio, 일반 페이지</li>
+                    <li><strong>웹훅</strong>: n8n Form Trigger 연동 HTML (예: <code>webhooks/contact-form.html</code>)</li>
+                    <li><strong>AI 도구</strong>: AI 기반 도구 인터페이스 (예: <code>tools/script-generator.html</code>)</li>
+                </ul>
+                <p style="margin-top: 1rem;">
+                    <strong>배포 방법:</strong> Claude에게 "realhun 서버에 [파일명] 배포해줘. 경로: [서버 경로]" 라고 요청하세요.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function convertUrl() {
+            const category = document.getElementById('category').value;
+            let filename = document.getElementById('filename').value.trim();
+            
+            if (!filename) {
+                alert('파일명을 입력하세요');
+                return;
+            }
+            
+            // .html 확장자 자동 추가
+            if (!filename.endsWith('.html')) {
+                filename += '.html';
+            }
+            
+            const baseUrl = 'https://admin.hyehwa72.org/';
+            const basePath = '/root/realhun-app/frontend/admin/';
+            
+            const url = baseUrl + category + filename;
+            const path = basePath + category + filename;
+            
+            document.getElementById('resultUrl').textContent = url;
+            document.getElementById('resultPath').textContent = path;
+            document.getElementById('result').classList.add('show');
+        }
+        
+        function copyText(elementId, btn) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.classList.add('copied');
+                btn.innerHTML = '<i class="bi bi-check"></i> 복사됨';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = '<i class="bi bi-clipboard"></i> 복사';
+                }, 2000);
+            });
+        }
+        
+        // Enter 키로 변환
+        document.getElementById('filename').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') convertUrl();
+        });
+    </script>
+</body>
+</html>

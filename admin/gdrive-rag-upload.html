@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📁 Google Drive → RAG 업로드</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        
+        /* 통계 카드 */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+        .stat-card .label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* 메인 카드 */
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        /* 폼 요소 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 1rem;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+        
+        /* 카테고리 버튼 그룹 */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .category-btn {
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        .category-btn:hover {
+            background: rgba(78,205,196,0.2);
+            border-color: #4ecdc4;
+        }
+        .category-btn.selected {
+            background: #4ecdc4;
+            color: #000;
+            border-color: #4ecdc4;
+        }
+        
+        /* 버튼 */
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            margin-left: 10px;
+        }
+        
+        /* 프로그레스 바 */
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .progress-bar {
+            height: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        /* 로그 영역 */
+        .log-area {
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+        .log-area .log-item {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .log-item.success { color: #4ecdc4; }
+        .log-item.error { color: #ff6b6b; }
+        .log-item.warning { color: #ffd93d; }
+        .log-item.info { color: #74b9ff; }
+        
+        /* 폴더 정보 */
+        .folder-info {
+            background: rgba(78,205,196,0.1);
+            border: 1px solid rgba(78,205,196,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+        .folder-info h3 {
+            color: #4ecdc4;
+            margin-bottom: 10px;
+        }
+        
+        /* 도움말 */
+        .help-text {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 8px;
+        }
+        .help-text code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📁 Google Drive → RAG 업로드</h1>
+        <p class="subtitle">Google Drive 폴더의 워크플로우를 RAG 지식 저장소에 업로드</p>
+        
+        <!-- 통계 -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number" id="stat-workflows">-</div>
+                <div class="label">n8n-workflows</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="stat-knowledge">-</div>
+                <div class="label">n8n-knowledge</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="stat-realestate">-</div>
+                <div class="label">realestate</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="stat-shorts">-</div>
+                <div class="label">shorts</div>
+            </div>
+        </div>
+        
+        <!-- 업로드 폼 -->
+        <div class="card">
+            <h2>🚀 워크플로우 폴더 업로드</h2>
+            
+            <div class="form-group">
+                <label>Google Drive 폴더 ID</label>
+                <input type="text" id="folder-id" placeholder="예: 1ABC123xyz...">
+                <p class="help-text">
+                    Google Drive 폴더 URL에서 ID 추출: 
+                    <code>https://drive.google.com/drive/folders/<strong>1ABC123xyz</strong></code>
+                </p>
+            </div>
+            
+            <div class="form-group">
+                <label>카테고리 선택</label>
+                <div class="category-grid">
+                    <button class="category-btn" data-category="1_Triggers">1️⃣ Triggers</button>
+                    <button class="category-btn" data-category="2_Data_Processing">2️⃣ Data Processing</button>
+                    <button class="category-btn" data-category="3_Integrations">3️⃣ Integrations</button>
+                    <button class="category-btn" data-category="4_Communication">4️⃣ Communication</button>
+                    <button class="category-btn" data-category="5_AI_Automation">5️⃣ AI Automation</button>
+                    <button class="category-btn" data-category="6_DevOps">6️⃣ DevOps</button>
+                    <button class="category-btn" data-category="7_Error_Handling">7️⃣ Error Handling</button>
+                    <button class="category-btn" data-category="8_Templates">8️⃣ Templates</button>
+                    <button class="category-btn" data-category="9_Domain_Specific">9️⃣ Domain Specific</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>네임스페이스</label>
+                <select id="namespace">
+                    <option value="n8n-workflows">n8n-workflows (워크플로우)</option>
+                    <option value="n8n-knowledge">n8n-knowledge (지식/문서)</option>
+                    <option value="realestate">realestate (부동산)</option>
+                    <option value="shorts">shorts (유튜브 숏폼)</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" id="upload-btn" onclick="startUpload()">
+                📤 업로드 시작
+            </button>
+            <button class="btn btn-secondary" onclick="refreshStats()">
+                🔄 통계 새로고침
+            </button>
+            
+            <div class="progress-container" id="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill">0%</div>
+                </div>
+            </div>
+            
+            <div class="folder-info" id="folder-info">
+                <h3>📂 폴더 정보</h3>
+                <div id="folder-details"></div>
+            </div>
+        </div>
+        
+        <!-- 로그 -->
+        <div class="card">
+            <h2>📋 실행 로그</h2>
+            <div style="margin-bottom: 15px;">
+                <button class="btn btn-secondary" onclick="clearLog()">🗑️ 로그 삭제</button>
+            </div>
+            <div class="log-area" id="log-area">
+                <div class="log-item info">시스템 준비 완료. 폴더 ID를 입력하고 업로드를 시작하세요.</div>
+            </div>
+        </div>
+        
+        <!-- 폴더 ID 가이드 -->
+        <div class="card">
+            <h2>📖 사용 방법</h2>
+            <ol style="padding-left: 20px; color: #aaa; line-height: 1.8;">
+                <li>Google Drive에서 업로드할 폴더 열기</li>
+                <li>주소창에서 폴더 ID 복사 (folders/ 뒤의 문자열)</li>
+                <li>위 입력란에 붙여넣기</li>
+                <li>카테고리 선택 (선택사항)</li>
+                <li><strong>업로드 시작</strong> 버튼 클릭</li>
+            </ol>
+            <p style="margin-top: 15px; color: #888;">
+                💡 <strong>workflows_organized</strong> 폴더의 서브폴더 ID들:
+            </p>
+            <div style="margin-top: 10px; font-family: monospace; font-size: 0.85rem; color: #4ecdc4;">
+                <!-- 여기에 실제 폴더 ID들을 추가할 수 있음 -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const CONFIG = {
+            webhookUrl: 'https://n8n.hyehwa72.org/webhook/gdrive-rag-upload',
+            ragApiUrl: 'https://api.hyehwa72.org/api/rag'
+        };
+        
+        let selectedCategory = null;
+        
+        // 카테고리 버튼 이벤트
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedCategory = btn.dataset.category;
+            });
+        });
+        
+        // 로그 추가
+        function addLog(message, type = 'info') {
+            const logArea = document.getElementById('log-area');
+            const time = new Date().toLocaleTimeString('ko-KR');
+            const div = document.createElement('div');
+            div.className = `log-item ${type}`;
+            div.textContent = `[${time}] ${message}`;
+            logArea.appendChild(div);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log-area').innerHTML = 
+                '<div class="log-item info">로그가 초기화되었습니다.</div>';
+        }
+        
+        // 통계 새로고침
+        async function refreshStats() {
+            try {
+                const namespaces = ['n8n-workflows', 'n8n-knowledge', 'realestate', 'shorts'];
+                
+                for (const ns of namespaces) {
+                    const res = await fetch(`${CONFIG.ragApiUrl}/list/${ns}?limit=1`);
+                    const data = await res.json();
+                    const elementId = `stat-${ns.replace('n8n-', '')}`;
+                    document.getElementById(elementId).textContent = data.total || 0;
+                }
+                
+                addLog('통계 새로고침 완료', 'success');
+            } catch (e) {
+                addLog(`통계 로드 실패: ${e.message}`, 'error');
+            }
+        }
+        
+        // 업로드 시작
+        async function startUpload() {
+            const folderId = document.getElementById('folder-id').value.trim();
+            const namespace = document.getElementById('namespace').value;
+            
+            if (!folderId) {
+                addLog('폴더 ID를 입력하세요!', 'warning');
+                return;
+            }
+            
+            const uploadBtn = document.getElementById('upload-btn');
+            const progressContainer = document.getElementById('progress-container');
+            const progressFill = document.getElementById('progress-fill');
+            
+            uploadBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressFill.textContent = '처리 중...';
+            
+            addLog(`🚀 업로드 시작: 폴더 ${folderId}`, 'info');
+            addLog(`📁 카테고리: ${selectedCategory || '없음'}`, 'info');
+            addLog(`📦 네임스페이스: ${namespace}`, 'info');
+            
+            try {
+                const response = await fetch(CONFIG.webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        folderId: folderId,
+                        category: selectedCategory,
+                        namespace: namespace
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    progressFill.style.width = '100%';
+                    progressFill.textContent = '완료!';
+                    addLog(`✅ ${result.message}`, 'success');
+                    addLog(`📊 저장: ${result.saved_count}개, 실패: ${result.failed_count}개`, 'info');
+                    refreshStats();
+                } else {
+                    progressFill.style.width = '100%';
+                    progressFill.style.background = '#ff6b6b';
+                    progressFill.textContent = '실패';
+                    addLog(`❌ 오류: ${result.message || result.error || 'Unknown error'}`, 'error');
+                }
+            } catch (e) {
+                progressFill.style.width = '100%';
+                progressFill.style.background = '#ff6b6b';
+                progressFill.textContent = '오류';
+                addLog(`❌ 요청 실패: ${e.message}`, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+            }
+        }
+        
+        // 페이지 로드 시 통계 가져오기
+        refreshStats();
+    </script>
+</body>
+</html>

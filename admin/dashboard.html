@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>혜화72 통합 대시보드</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/gridstack@10.3.1/dist/gridstack.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/gridstack@10.3.1/dist/gridstack-extra.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* 네온 사이버펑크 컬러 */
+            --neon-pink: #ff006e;
+            --neon-cyan: #00f5ff;
+            --neon-purple: #b100ff;
+            --neon-blue: #0066ff;
+            --neon-green: #39ff14;
+            --neon-orange: #ff3300;
+
+            /* 배경 */
+            --bg-dark: #0a0a0f;
+            --bg-darker: #050508;
+            --bg-card: rgba(20, 20, 30, 0.6);
+
+            /* 글래스 */
+            --glass-bg: rgba(20, 20, 40, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+
+            /* 텍스트 - 가독성 강화 */
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #b0b0b0;
+
+            /* 그라데이션 */
+            --gradient-neon-1: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            --gradient-neon-2: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            --gradient-neon-3: linear-gradient(135deg, var(--neon-purple), var(--neon-pink), var(--neon-cyan));
+
+            --sidebar-width: 320px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            min-height: 100vh;
+            color: var(--text-primary);
+            font-weight: 500;
+            /* 네온 사이버펑크 배경 */
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(255, 0, 110, 0.15) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(177, 0, 255, 0.15) 0, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 245, 255, 0.15) 0, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(0, 102, 255, 0.15) 0, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Glass Effect Utility - 네온 글로우 */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .glass::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 16px;
+            padding: 2px;
+            background: var(--gradient-neon-3);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .glass:hover::before {
+            opacity: 1;
+            animation: neonPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes neonPulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+        }
+
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        .widget-title,
+        .stat-label,
+        .webhook-name {
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            color: white;
+            border: none;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            justify-content: center;
+            border-radius: 10px;
+        }
+
+        /* Sidebar */
+        .sidebar-toggle {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 16px 8px;
+            border-radius: 10px 0 0 10px;
+            cursor: pointer;
+            z-index: 999;
+            writing-mode: vertical-rl;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .sidebar-toggle:hover {
+            padding-right: 12px;
+        }
+
+        .sidebar {
+            position: fixed;
+            right: -340px;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            padding: 80px 20px 20px;
+            z-index: 998;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .widget-card-draggable {
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            cursor: grab;
+            transition: all 0.2s;
+            border: 2px dashed var(--glass-border);
+        }
+
+        .widget-card-draggable:hover {
+            border-color: var(--accent);
+            background: var(--glass-bg);
+        }
+
+        .widget-card-draggable:active {
+            cursor: grabbing;
+        }
+
+        .widget-card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .widget-card-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 0 24px 24px;
+        }
+
+        /* Gridstack */
+        .grid-stack {
+            background: transparent;
+        }
+
+        .grid-stack-item-content {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-stack>.grid-stack-item>.grid-stack-item-content {
+            inset: 8px;
+        }
+
+        /* Widget */
+        .widget {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .widget-header {
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .widget-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .widget-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .widget-action {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            background: transparent;
+            border: none;
+        }
+
+        .widget-action:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text-primary);
+        }
+
+        .widget-action.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .widget-body {
+            padding: 20px;
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* Widget Content Styles */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .quick-link {
+            padding: 16px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .quick-link:hover {
+            background: var(--glass-bg);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .quick-link i {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .quick-link span {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .stat-item {
+            padding: 16px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .webhook-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .webhook-item {
+            padding: 12px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .webhook-item:hover {
+            background: var(--glass-bg);
+        }
+
+        .webhook-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .webhook-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .webhook-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .webhook-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .clock-widget {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .clock-time {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .clock-date {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* Trash Zone */
+        .trash-zone {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+
+        .trash-zone.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1002;
+        }
+
+        .toast {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--info);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+                right: -280px;
+            }
+
+            .stats-grid,
+            .quick-links {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header glass">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                <h1 class="page-title">혜화72 통합 대시보드</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-icon" onclick="toggleTheme()" id="themeBtn" title="테마 전환">
+                    <i class="bi bi-moon-fill"></i>
+                </button>
+                <button class="btn" onclick="toggleLock()" id="lockBtn">
+                    <i class="bi bi-unlock"></i> 편집 모드
+                </button>
+                <button class="btn" onclick="resetLayout()">
+                    <i class="bi bi-arrow-counterclockwise"></i> 초기화
+                </button>
+                <button class="btn btn-primary" onclick="saveLayout()">
+                    <i class="bi bi-save"></i> 저장
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="bi bi-plus-lg"></i> 위젯
+    </div>
+
+    <aside class="sidebar glass" id="sidebar">
+        <div class="sidebar-title">
+            <i class="bi bi-grid-3x3-gap"></i> 위젯 라이브러리
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">즐겨찾기 & 제어</div>
+            <div class="widget-card-draggable glass" gs-w="6" gs-h="5" data-widget-type="webhook-favorites">
+                <div class="widget-card-icon">⭐</div>
+                <div class="widget-card-name">웹훅 즐겨찾기</div>
+            </div>
+            <div class="widget-card-draggable glass" gs-w="6" gs-h="4" data-widget-type="n8n-stats">
+                <div class="widget-card-icon"><i class="bi bi-gear-wide-connected"></i></div>
+                <div class="widget-card-name">n8n 통계</div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">링크 & 유틸리티</div>
+            <div class="widget-card-draggable glass" gs-w="4" gs-h="4" data-widget-type="quick-links">
+                <div class="widget-card-icon"><i class="bi bi-lightning-charge"></i></div>
+                <div class="widget-card-name">빠른 링크</div>
+            </div>
+            <div class="widget-card-draggable glass" gs-w="4" gs-h="3" data-widget-type="clock">
+                <div class="widget-card-icon"><i class="bi bi-clock"></i></div>
+                <div class="widget-card-name">시계</div>
+            </div>
+            <div class="widget-card-draggable glass" gs-w="6" gs-h="6" data-widget-type="help">
+                <div class="widget-card-icon"><i class="bi bi-question-circle"></i></div>
+                <div class="widget-card-name">도움말</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-container">
+        <div class="grid-stack" id="mainGrid"></div>
+    </main>
+
+    <div class="trash-zone" id="trashZone">
+        <i class="bi bi-trash3"></i> 여기에 놓으면 삭제
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gridstack@10.3.1/dist/gridstack-all.min.js"></script>
+    <script>
+        const API_BASE = '/n8n-api/v1';
+        const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4OTY3ODUyYy0yNjE4LTQwMDUtYWIwNy0wMjlmZmNkZDYyZjYiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY2NzEzMzM0fQ.jQHqAw8b4Y1hUdPZbh2G2yPZjTgwKesB5Xl8wJy3CFw';
+        const headers = { 'X-N8N-API-KEY': API_KEY, 'Content-Type': 'application/json' };
+
+        let grid, isLocked = false;
+
+        const widgetTemplates = {
+            'webhook-favorites': {
+                w: 6, h: 5,
+                render: () => `
+                    <div class="widget glass">
+                        <div class="widget-header">
+                            <div class="widget-title">⭐ 웹훅 즐겨찾기</div>
+                            <div class="widget-actions">
+                                <button class="widget-action" onclick="refreshWebhooks()"><i class="bi bi-arrow-clockwise"></i></button>
+                                <button class="widget-action delete" onclick="removeWidget(this)"><i class="bi bi-x"></i></button>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="webhook-list" id="webhookList">
+                                <div class="empty-state">
+                                    <i class="bi bi-stars"></i>
+                                    <h3>즐겨찾기가 비어있습니다</h3>
+                                    <p style="font-size:0.9rem;">n8n 제어 패널에서 웹훅을 추가해보세요</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'n8n-stats': {
+                w: 6, h: 4,
+                render: () => `
+                    <div class="widget glass">
+                        <div class="widget-header">
+                            <div class="widget-title"><i class="bi bi-gear-wide-connected"></i> n8n 통계</div>
+                            <div class="widget-actions">
+                                <button class="widget-action" onclick="loadN8nStats()"><i class="bi bi-arrow-clockwise"></i></button>
+                                <button class="widget-action" onclick="window.open('n8n-control.html','_blank')"><i class="bi bi-box-arrow-up-right"></i></button>
+                                <button class="widget-action delete" onclick="removeWidget(this)"><i class="bi bi-x"></i></button>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-value" id="totalWorkflows">-</div>
+                                    <div class="stat-label">전체 워크플로우</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="activeWorkflows">-</div>
+                                    <div class="stat-label">활성화</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="inactiveWorkflows">-</div>
+                                    <div class="stat-label">비활성화</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="webhookWorkflows">-</div>
+                                    <div class="stat-label">Webhook</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'quick-links': {
+                w: 4, h: 4,
+                render: () => `
+                    <div class="widget glass">
+                        <div class="widget-header">
+                            <div class="widget-title"><i class="bi bi-lightning-charge"></i> 빠른 링크</div>
+                            <div class="widget-actions">
+                                <button class="widget-action delete" onclick="removeWidget(this)"><i class="bi bi-x"></i></button>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="quick-links">
+                                <a href="webhook-favorites.html" class="quick-link">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span>웹훅 즐겨찾기</span>
+                                </a>
+                                <a href="n8n-control.html" class="quick-link">
+                                    <i class="bi bi-gear-wide-connected"></i>
+                                    <span>n8n 제어</span>
+                                </a>
+                                <a href="https://n8n.hyehwa72.org" target="_blank" class="quick-link">
+                                    <i class="bi bi-diagram-3"></i>
+                                    <span>n8n 대시보드</span>
+                                </a>
+                                <a href="portal.html" class="quick-link">
+                                    <i class="bi bi-house"></i>
+                                    <span>포털</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'clock': {
+                w: 4, h: 3,
+                render: () => `
+                    <div class="widget glass">
+                        <div class="widget-header">
+                            <div class="widget-title"><i class="bi bi-clock"></i> 시계</div>
+                            <div class="widget-actions">
+                                <button class="widget-action delete" onclick="removeWidget(this)"><i class="bi bi-x"></i></button>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="clock-widget">
+                                <div class="clock-time" id="clockTime">00:00:00</div>
+                                <div class="clock-date" id="clockDate">-</div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'help': {
+                w: 6, h: 6,
+                render: () => `
+                    <div class="widget glass">
+                        <div class="widget-header">
+                            <div class="widget-title"><i class="bi bi-question-circle"></i> 도움말</div>
+                            <div class="widget-actions">
+                                <button class="widget-action delete" onclick="removeWidget(this)"><i class="bi bi-x"></i></button>
+                            </div>
+                        </div>
+                        <div class="widget-body" style="font-size: 0.9rem; line-height: 1.6;">
+                            <div style="max-height: 100%; overflow-y: auto; padding-right: 8px;">
+                                <h3 style="font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="bi bi-grid-3x3-gap"></i> 위젯 추가
+                                </h3>
+                                <p style="margin-bottom: 16px; color: var(--text-secondary);">
+                                    1. 우측 <strong>"위젯"</strong> 버튼 클릭<br>
+                                    2. 원하는 위젯 카드를 <strong>드래그</strong><br>
+                                    3. 메인 영역에 <strong>드롭</strong>
+                                </p>
+
+                                <h3 style="font-size: 1.1rem; margin-bottom: 12px; margin-top: 20px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="bi bi-star"></i> 웹훅 즐겨찾기
+                                </h3>
+                                <p style="margin-bottom: 16px; color: var(--text-secondary);">
+                                    <strong>등록:</strong> <a href="n8n-control.html" style="color: var(--accent);">n8n 제어 패널</a>에서 별 버튼 클릭<br>
+                                    <strong>실행:</strong> ▶️ 버튼으로 즉시 실행<br>
+                                    <strong>주의:</strong> 활성화된 웹훅만 실행 가능
+                                </p>
+
+                                <h3 style="font-size: 1.1rem; margin-bottom: 12px; margin-top: 20px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="bi bi-layout-wtf"></i> 레이아웃
+                                </h3>
+                                <p style="margin-bottom: 16px; color: var(--text-secondary);">
+                                    <strong>이동:</strong> 헤더를 드래그<br>
+                                    <strong>크기조절:</strong> 모서리를 드래그<br>
+                                    <strong>삭제:</strong> X 버튼 또는 휴지통으로 드래그<br>
+                                    <strong>저장:</strong> 상단 "저장" 버튼 클릭
+                                </p>
+
+                                <div style="margin-top: 20px; padding: 12px; background: rgba(0, 0, 0, 0.1); border-radius: 8px; border-left: 3px solid var(--accent);">
+                                    <strong style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                        <i class="bi bi-lightbulb"></i> 빠른 팁
+                                    </strong>
+                                    <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary);">
+                                        <li>자주 보는 위젯은 상단에 배치</li>
+                                        <li>레이아웃은 자동 저장됨</li>
+                                        <li>테마는 우측 상단에서 전환</li>
+                                    </ul>
+                                </div>
+
+                                <div style="margin-top: 16px; text-align: center;">
+                                    <a href="https://admin.hyehwa72.org/dashboard_user_guide.md" target="_blank" style="color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                        <i class="bi bi-book"></i> 전체 가이드 보기
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        const defaultLayout = [
+            { x: 0, y: 0, w: 6, h: 5, id: 'webhook-favorites', content: widgetTemplates['webhook-favorites'].render() },
+            { x: 6, y: 0, w: 6, h: 4, id: 'n8n-stats', content: widgetTemplates['n8n-stats'].render() },
+            { x: 0, y: 5, w: 4, h: 4, id: 'quick-links', content: widgetTemplates['quick-links'].render() },
+            { x: 4, y: 5, w: 4, h: 3, id: 'clock', content: widgetTemplates['clock'].render() }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            // Load theme
+            const savedTheme = localStorage.getItem('dashboardTheme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeButton(savedTheme);
+
+            // Initialize Gridstack
+            grid = GridStack.init({
+                column: 12,
+                cellHeight: 60,
+                margin: 8,
+                float: true,
+                animate: true,
+                draggable: { handle: '.widget-header' },
+                resizable: { handles: 'e,se,s,sw,w' },
+                removable: '#trashZone',
+                acceptWidgets: true
+            }, '#mainGrid');
+
+            // Load layout
+            const saved = localStorage.getItem('dashboardLayout');
+            if (saved) {
+                try {
+                    grid.load(JSON.parse(saved));
+                    showToast('저장된 레이아웃 로드됨', 'info');
+                } catch (e) {
+                    grid.load(defaultLayout);
+                }
+            } else {
+                grid.load(defaultLayout);
+            }
+
+            // Setup drag-in from sidebar
+            GridStack.setupDragIn('.widget-card-draggable', {
+                appendTo: 'body',
+                helper: function (e) {
+                    const el = e.target.closest('.widget-card-draggable');
+                    const clone = el.cloneNode(true);
+                    clone.style.width = '200px';
+                    clone.style.opacity = '0.8';
+                    return clone;
+                }
+            });
+
+            // Grid events
+            grid.on('dropped', function (event, prev, newW) {
+                if (newW && newW.el) {
+                    const type = newW.el.getAttribute('data-widget-type') ||
+                        newW.el.querySelector('[data-widget-type]')?.getAttribute('data-widget-type');
+                    if (type && widgetTemplates[type]) {
+                        newW.el.querySelector('.grid-stack-item-content').innerHTML = widgetTemplates[type].render();
+                        if (type === 'webhook-favorites') refreshWebhooks();
+                        if (type === 'n8n-stats') loadN8nStats();
+                        if (type === 'clock') startClock();
+                        showToast('위젯 추가됨', 'success');
+                    }
+                }
+            });
+
+            grid.on('dragstart', () => document.getElementById('trashZone').classList.add('active'));
+            grid.on('dragstop', () => document.getElementById('trashZone').classList.remove('active'));
+            grid.on('removed', () => showToast('위젯 삭제됨', 'info'));
+
+            // Initial load
+            refreshWebhooks();
+            loadN8nStats();
+            startClock();
+        });
+
+        // Theme Toggle
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('dashboardTheme', newTheme);
+            updateThemeButton(newTheme);
+            showToast(`${newTheme === 'dark' ? '다크' : '라이트'} 모드로 전환됨`, 'info');
+        }
+
+        function updateThemeButton(theme) {
+            const btn = document.getElementById('themeBtn');
+            btn.innerHTML = theme === 'dark' ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-fill"></i>';
+        }
+
+        // Lock Toggle
+        function toggleLock() {
+            isLocked = !isLocked;
+            const btn = document.getElementById('lockBtn');
+            if (isLocked) {
+                grid.enableMove(false);
+                grid.enableResize(false);
+                btn.innerHTML = '<i class="bi bi-lock"></i> 잠금';
+                showToast('레이아웃 잠김', 'info');
+            } else {
+                grid.enableMove(true);
+                grid.enableResize(true);
+                btn.innerHTML = '<i class="bi bi-unlock"></i> 편집 모드';
+                showToast('편집 모드', 'info');
+            }
+        }
+
+        // Layout Management
+        function saveLayout() {
+            localStorage.setItem('dashboardLayout', JSON.stringify(grid.save(false, true)));
+            showToast('저장 완료! 💾', 'success');
+        }
+
+        function resetLayout() {
+            if (confirm('레이아웃을 초기화하시겠습니까?')) {
+                localStorage.removeItem('dashboardLayout');
+                grid.removeAll();
+                grid.load(defaultLayout);
+                refreshWebhooks();
+                loadN8nStats();
+                startClock();
+                showToast('초기화 완료', 'info');
+            }
+        }
+
+        function removeWidget(btn) {
+            const widget = btn.closest('.grid-stack-item');
+            if (widget) grid.removeWidget(widget);
+        }
+
+        // Sidebar Toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function (e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Load Webhook Favorites
+        async function refreshWebhooks() {
+            const list = document.getElementById('webhookList');
+            if (!list) return;
+
+            const bookmarks = JSON.parse(localStorage.getItem('webhookBookmarks') || '[]');
+            if (bookmarks.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="bi bi-stars"></i><h3>즐겨찾기가 비어있습니다</h3><p style="font-size:0.9rem;">n8n 제어 패널에서 웹훅을 추가해보세요</p></div>';
+                return;
+            }
+
+            try {
+                const r = await fetch(API_BASE + '/workflows', { headers });
+                if (r.ok) {
+                    const data = await r.json();
+                    const workflows = data.data || [];
+                    const bookmarked = workflows.filter(w => bookmarks.includes(w.id) && hasWebhook(w));
+
+                    if (bookmarked.length === 0) {
+                        list.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><h3>조건에 맞는 웹훅이 없습니다</h3></div>';
+                        return;
+                    }
+
+                    list.innerHTML = bookmarked.map(w => `
+                        <div class="webhook-item">
+                            <div class="webhook-info">
+                                <div class="webhook-name">${w.name}</div>
+                            </div>
+                            <div class="webhook-actions">
+                                <button class="btn btn-icon" onclick="executeWebhook('${w.id}')" ${w.active ? '' : 'disabled'} title="실행">
+                                    <i class="bi bi-play-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Webhook load error:', e);
+            }
+        }
+
+        function hasWebhook(w) {
+            return w.nodes?.some(n => n.type?.toLowerCase().includes('webhook'));
+        }
+
+        async function executeWebhook(id) {
+            // Implementation from n8n-control.html
+            showToast('웹훅 실행 중...', 'info');
+            // Add actual execution logic here
+        }
+
+        // Load n8n Stats
+        async function loadN8nStats() {
+            try {
+                const r = await fetch(API_BASE + '/workflows', { headers });
+                if (r.ok) {
+                    const data = await r.json();
+                    const workflows = data.data || [];
+                    const total = workflows.length;
+                    const active = workflows.filter(w => w.active).length;
+                    const inactive = total - active;
+                    const webhook = workflows.filter(w => hasWebhook(w)).length;
+
+                    const els = {
+                        totalWorkflows: document.getElementById('totalWorkflows'),
+                        activeWorkflows: document.getElementById('activeWorkflows'),
+                        inactiveWorkflows: document.getElementById('inactiveWorkflows'),
+                        webhookWorkflows: document.getElementById('webhookWorkflows')
+                    };
+
+                    if (els.totalWorkflows) els.totalWorkflows.textContent = total;
+                    if (els.activeWorkflows) els.activeWorkflows.textContent = active;
+                    if (els.inactiveWorkflows) els.inactiveWorkflows.textContent = inactive;
+                    if (els.webhookWorkflows) els.webhookWorkflows.textContent = webhook;
+                }
+            } catch (e) {
+                console.error('Stats load error:', e);
+            }
+        }
+
+        // Clock Widget
+        function startClock() {
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const timeEl = document.getElementById('clockTime');
+            const dateEl = document.getElementById('clockDate');
+
+            if (timeEl) {
+                timeEl.textContent = now.toLocaleTimeString('ko-KR');
+            }
+            if (dateEl) {
+                dateEl.textContent = now.toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'long'
+                });
+            }
+        }
+
+        // Toast
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i><span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

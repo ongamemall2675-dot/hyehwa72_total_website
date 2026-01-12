@@ -1,0 +1,65 @@
+<!-- 도움말 오버레이 -->
+<div class="help-overlay" id="helpOverlay" onclick="toggleHelpPanel()"></div>
+<div class="help-panel" id="helpPanel">
+    <div class="help-panel-header">
+        <h3><i class="bi bi-question-circle"></i> 도움말</h3>
+        <button class="help-panel-close" onclick="toggleHelpPanel()"><i class="bi bi-x"></i></button>
+    </div>
+    <div class="help-tabs">
+        <button class="help-tab active" onclick="showHelpTab('basic')">기본 사용법</button>
+        <button class="help-tab" onclick="showHelpTab('deploy')">배포 가이드</button>
+        <button class="help-tab" onclick="showHelpTab('links')">바로가기</button>
+    </div>
+    <div class="help-panel-content">
+        <div class="help-tab-content active" id="helpTab-basic">
+            <div class="help-section"><h4><i class="bi bi-hand-index"></i> 앱 실행</h4>
+                <div class="help-step"><div class="help-step-num">1</div><div class="help-step-content"><strong>더블클릭</strong><span>사이드바 앱 아이콘 더블클릭</span></div></div>
+                <div class="help-step"><div class="help-step-num">2</div><div class="help-step-content"><strong>드래그</strong><span>편집 모드에서 그리드 배치</span></div></div>
+            </div>
+            <div class="help-section"><h4><i class="bi bi-pencil"></i> 편집 모드</h4>
+                <p>상단 편집 버튼 클릭 시 활성화</p>
+                <div class="help-step"><div class="help-step-num">↔</div><div class="help-step-content"><strong>이동</strong><span>드래그하여 위치 변경</span></div></div>
+                <div class="help-step"><div class="help-step-num">⤢</div><div class="help-step-content"><strong>크기</strong><span>모서리 드래그</span></div></div>
+            </div>
+            <div class="help-section"><h4><i class="bi bi-keyboard"></i> 단축키</h4>
+                <table class="help-table"><tr><th>단축키</th><th>기능</th></tr><tr><td><code>Ctrl+S</code></td><td>저장</td></tr><tr><td><code>Ctrl+Shift+R</code></td><td>새로고침</td></tr></table>
+            </div>
+        </div>
+        <div class="help-tab-content" id="helpTab-deploy">
+            <div class="help-section"><h4><i class="bi bi-diagram-3"></i> 배포 프로세스</h4>
+                <div class="help-step"><div class="help-step-num">1</div><div class="help-step-content"><strong>n8n 등록</strong><span>Import → Credentials</span></div></div>
+                <div class="help-step"><div class="help-step-num">2</div><div class="help-step-content"><strong>활성화</strong><span>Save → Active ON</span></div></div>
+                <div class="help-step"><div class="help-step-num">3</div><div class="help-step-content"><strong>업로드</strong><span>SSH/SCP</span></div></div>
+                <div class="help-step"><div class="help-step-num">4</div><div class="help-step-content"><strong>아이콘</strong><span>앱 추가</span></div></div>
+            </div>
+            <div class="help-section"><h4><i class="bi bi-server"></i> 서버</h4>
+                <table class="help-table"><tr><th>항목</th><th>값</th></tr><tr><td>IP</td><td><code>152.42.210.15</code></td></tr><tr><td>경로</td><td><code>/root/realhun-app/frontend/admin/</code></td></tr></table>
+            </div>
+        </div>
+        <div class="help-tab-content" id="helpTab-links">
+            <div class="help-section"><h4><i class="bi bi-link-45deg"></i> 바로가기</h4>
+            <div class="help-links">
+<a href="https://n8n.hyehwa72.org" target="_blank" class="help-link"><i class="bi bi-diagram-3"></i><strong>n8n</strong></a>
+<a href="https://api.hyehwa72.org/docs" target="_blank" class="help-link"><i class="bi bi-database"></i><strong>RAG API</strong></a>
+<a href="index.html" class="help-link"><i class="bi bi-house"></i><strong>포털</strong></a>
+<a href="n8n-deploy-guide.html" target="_blank" class="help-link"><i class="bi bi-book"></i><strong>배포가이드</strong></a>
+<a href="n8n-generator.html" class="help-link"><i class="bi bi-robot"></i><strong>n8n생성기</strong></a>
+</div></div></div>
+    </div></div>
+<div class="settings-modal" id="settingsModal"><div class="settings-content">
+    <div class="settings-header"><h3><i class="bi bi-gear"></i> 설정</h3>
+        <button class="help-panel-close" onclick="toggleSettings()"><i class="bi bi-x"></i></button></div>
+    <div class="settings-body">
+        <div class="settings-group"><h4><i class="bi bi-grid"></i> 레이아웃</h4>
+            <div class="settings-item"><div class="settings-label"><strong>자동 저장</strong></div>
+                <label class="settings-toggle"><input type="checkbox" id="settingAutoSave" checked><span class="slider"></span></label></div></div>
+        <div class="settings-group"><h4><i class="bi bi-hdd"></i> 데이터</h4>
+            <div class="settings-item"><div class="settings-label"><strong>스토리지</strong></div>
+                <button class="btn btn-sm btn-secondary" onclick="showStorageInfo()">확인</button></div>
+            <div class="settings-item"><div class="settings-label"><strong>초기화</strong></div>
+                <button class="btn btn-sm" style="background:#ef4444;color:white" onclick="confirmResetAll()">초기화</button></div></div>
+    </div>
+    <div class="settings-footer">
+        <button class="btn btn-secondary" onclick="toggleSettings()">닫기</button>
+        <button class="btn btn-primary" onclick="saveSettings()"><i class="bi bi-check"></i> 저장</button>
+    </div></div></div>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고객 관리 - 혜화72 부동산</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #1e1e2d;
+            --primary: #5c6bc0;
+            --text-muted: #a2a5b9;
+        }
+
+        * {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-brand-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-nav {
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #2d2d3f;
+            color: #fff;
+            border-left: 3px solid var(--primary);
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: #fff;
+            padding: 15px 25px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .badge-vip {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon"><i class="bi bi-building"></i></div>
+            <div>
+                <h5 class="mb-0 fw-bold">혜화72</h5><small style="color:#a2a5b9">부동산 관리시스템</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="bi bi-grid-1x2"></i> 대시보드</a>
+            <a href="ledger.html" class="nav-item"><i class="bi bi-journal-text"></i> 부동산 원장</a>
+            <a href="properties.html" class="nav-item"><i class="bi bi-building"></i> 매물 관리</a>
+            <a href="customers.html" class="nav-item active"><i class="bi bi-people"></i> 고객 관리</a>
+            <a href="requests.html" class="nav-item"><i class="bi bi-clipboard-check"></i> 의뢰 관리</a>
+            <a href="contracts.html" class="nav-item"><i class="bi bi-file-earmark-text"></i> 계약 관리</a>
+            <a href="schedules.html" class="nav-item"><i class="bi bi-calendar3"></i> 일정 관리</a>
+            <a href="settings.html" class="nav-item"><i class="bi bi-gear"></i> 설정</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="d-flex align-items-center gap-2">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style="width:36px;height:36px"><i class="bi bi-person text-white"></i></div>
+                <div>
+                    <div class="fw-bold">김훈</div><small style="color:#a2a5b9">대학로혜화72</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <div class="topbar">
+            <h5 class="mb-0"><i class="bi bi-people me-2"></i>고객 관리</h5>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#customerModal"><i
+                    class="bi bi-person-plus me-1"></i>고객 등록</button>
+        </div>
+        <div class="content">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4"><input type="text" class="form-control" placeholder="이름/연락처 검색"></div>
+                        <div class="col-md-3"><select class="form-select">
+                                <option value="">고객유형</option>
+                                <option>VIP</option>
+                                <option>일반</option>
+                                <option>잠재</option>
+                            </select></div>
+                        <div class="col-md-3"><select class="form-select">
+                                <option value="">고객분류</option>
+                                <option>매수자</option>
+                                <option>매도자</option>
+                                <option>임차인</option>
+                                <option>임대인</option>
+                            </select></div>
+                        <div class="col-md-2"><button class="btn btn-primary w-100"><i class="bi bi-search"></i>
+                                검색</button></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>고객명</th>
+                                <th>연락처</th>
+                                <th>유형</th>
+                                <th>분류</th>
+                                <th>관심지역</th>
+                                <th>등록일</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-medium">김철수</td>
+                                <td>010-1234-5678</td>
+                                <td><span class="badge badge-vip">VIP</span></td>
+                                <td>매수자</td>
+                                <td>종로구</td>
+                                <td>2026-01-05</td>
+                                <td><button class="btn btn-outline-primary btn-sm"><i class="bi bi-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-medium">박영희</td>
+                                <td>010-9876-5432</td>
+                                <td><span class="badge bg-primary">일반</span></td>
+                                <td>임차인</td>
+                                <td>대학로</td>
+                                <td>2026-01-07</td>
+                                <td><button class="btn btn-outline-primary btn-sm"><i class="bi bi-eye"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="customerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>고객 등록</h5><button type="button"
+                        class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">고객명 *</label><input type="text" class="form-control">
+                    </div>
+                    <div class="mb-3"><label class="form-label">연락처 *</label><input type="tel" class="form-control">
+                    </div>
+                    <div class="mb-3"><label class="form-label">고객유형</label><select class="form-select">
+                            <option>일반</option>
+                            <option>VIP</option>
+                            <option>잠재</option>
+                        </select></div>
+                    <div class="mb-3"><label class="form-label">고객분류</label><select class="form-select">
+                            <option value="">선택</option>
+                            <option>매수자</option>
+                            <option>매도자</option>
+                            <option>임차인</option>
+                            <option>임대인</option>
+                        </select></div>
+                    <div class="mb-3"><label class="form-label">관심지역</label><input type="text" class="form-control">
+                    </div>
+                    <div class="mb-3"><label class="form-label">메모</label><textarea class="form-control"
+                            rows="2"></textarea></div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">취소</button><button
+                        class="btn btn-primary">등록</button></div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

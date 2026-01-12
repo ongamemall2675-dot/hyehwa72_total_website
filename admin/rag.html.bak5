@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG ì§€ì‹ ê´€ë¦¬</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-indigo-600 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold"><i class="fas fa-brain mr-2"></i>RAG ì§€ì‹ ê´€ë¦¬</h1>
+            <a href="/admin/" class="text-white hover:text-indigo-200"><i class="fas fa-home mr-1"></i>ê´€ë¦¬ì í™ˆ</a>
+        </div>
+    </nav>
+    <div class="container mx-auto p-4 max-w-6xl">
+        <div class="flex space-x-2 mb-4 flex-wrap">
+            <button onclick="showTab('upload')" id="tab-upload" class="tab-btn px-4 py-2 bg-indigo-600 text-white rounded-t-lg"><i class="fas fa-upload mr-1"></i>íŒŒì¼ ì—…ë¡œë“œ</button>
+            <button onclick="showTab('documents')" id="tab-documents" class="tab-btn px-4 py-2 bg-gray-300 rounded-t-lg"><i class="fas fa-file-alt mr-1"></i>ë¬¸ì„œ ê´€ë¦¬</button>
+            <button onclick="showTab('knowledge')" id="tab-knowledge" class="tab-btn px-4 py-2 bg-gray-300 rounded-t-lg"><i class="fas fa-database mr-1"></i>ì§€ì‹ë² ì´ìŠ¤</button>
+            <button onclick="showTab('search')" id="tab-search" class="tab-btn px-4 py-2 bg-gray-300 rounded-t-lg"><i class="fas fa-search mr-1"></i>ê²€ìƒ‰</button>
+        </div>
+
+        <!-- ì—…ë¡œë“œ íƒ­ -->
+        <div id="panel-upload" class="tab-panel bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-bold mb-4"><i class="fas fa-upload mr-2 text-indigo-600"></i>íŒŒì¼ ì—…ë¡œë“œ</h2>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">ë„¤ì„ìŠ¤í˜ì´ìŠ¤</label>
+                    <select id="upload-ns" class="w-full border rounded p-2">
+                        <option value="documents">documents</option>
+                        <option value="n8n-knowledge">n8n-knowledge</option>
+                        <option value="realestate">realestate</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">ì¹´í…Œê³ ë¦¬ (ì„ íƒ)</label>
+                    <input type="text" id="upload-cat" class="w-full border rounded p-2" placeholder="ì˜ˆ: guides, workflows">
+                </div>
+            </div>
+            <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 transition">
+                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                <p class="text-gray-600">íŒŒì¼ì„ ë“œë˜ê·¸í•˜ê±°ë‚˜ í´ë¦­í•˜ì—¬ ì„ íƒ</p>
+                <p class="text-sm text-gray-400 mt-1">ì§€ì›: txt, md, csv, json, xlsx, pdf, docx</p>
+                <input type="file" id="file-input" class="hidden" multiple accept=".txt,.md,.csv,.json,.xlsx,.xls,.pdf,.docx,.doc,.xml,.html,.py,.js">
+            </div>
+            <div id="upload-progress" class="mt-4 hidden">
+                <div class="bg-gray-200 rounded-full h-2"><div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all" style="width:0%"></div></div>
+                <p id="upload-status" class="text-sm text-gray-600 mt-1"></p>
+            </div>
+            <div id="upload-results" class="mt-4 space-y-2"></div>
+        </div>
+
+        <!-- ë¬¸ì„œ ê´€ë¦¬ íƒ­ -->
+        <div id="panel-documents" class="tab-panel hidden bg-white rounded-lg shadow p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold"><i class="fas fa-file-alt mr-2 text-indigo-600"></i>ì—…ë¡œë“œëœ ë¬¸ì„œ</h2>
+                <button onclick="loadDocuments()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"><i class="fas fa-sync-alt mr-1"></i>ìƒˆë¡œê³ ì¹¨</button>
+            </div>
+            <div id="documents-list" class="space-y-3"></div>
+        </div>
+
+        <!-- ì§€ì‹ë² ì´ìŠ¤ íƒ­ -->
+        <div id="panel-knowledge" class="tab-panel hidden bg-white rounded-lg shadow p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold"><i class="fas fa-database mr-2 text-indigo-600"></i>ì§€ì‹ë² ì´ìŠ¤ í˜„í™©</h2>
+                <button onclick="loadNamespaces()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"><i class="fas fa-sync-alt mr-1"></i>ìƒˆë¡œê³ ì¹¨</button>
+            </div>
+            <div id="namespaces-grid" class="grid grid-cols-4 gap-4 mb-6"></div>
+            <div class="mt-6">
+                <h3 class="font-bold mb-2">í•­ëª© ëª©ë¡</h3>
+                <select id="kb-namespace" class="border rounded p-2 mb-4" onchange="loadKnowledgeItems()"><option value="">ë„¤ì„ìŠ¤í˜ì´ìŠ¤ ì„ íƒ...</option></select>
+                <div id="knowledge-items" class="space-y-2 max-h-96 overflow-y-auto"></div>
+            </div>
+        </div>
+
+        <!-- ê²€ìƒ‰ íƒ­ -->
+        <div id="panel-search" class="tab-panel hidden bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-bold mb-4"><i class="fas fa-search mr-2 text-indigo-600"></i>ì‹œë§¨í‹± ê²€ìƒ‰</h2>
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-1">ê²€ìƒ‰ì–´</label>
+                    <input type="text" id="search-query" class="w-full border rounded p-2" placeholder="ê²€ìƒ‰í•  ë‚´ìš©...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">ë„¤ì„ìŠ¤í˜ì´ìŠ¤</label>
+                    <select id="search-namespace" class="w-full border rounded p-2"></select>
+                  </div>
+            </div>
+            <button onclick="performSearch()" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700"><i class="fas fa-search mr-1"></i>ê²€ìƒ‰</button>
+            <div id="search-results" class="mt-6 space-y-4"></div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'https://api.hyehwa72.org/api/rag';
+          
+        function showTab(tab) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('bg-indigo-600','text-white'); b.classList.add('bg-gray-300'); });
+            document.getElementById('panel-'+tab).classList.remove('hidden');
+            documVçBævWDVÆVÖVçD'”–B‚wF"Òr·F"’æ6Æ74Æ—7Bç&VÖ÷fR‚v&rÖw&’Ó3r“°¢Fö7VÖVçBævWDVÆVÖVçD'”–B‚wF"Òr·F"’æ6Æ74Æ—7BæFB‚v&rÖ–æF–vòÓcrÂwFW‡B×v†—FRr“°¢–b‡F#ÓÓÒv¶æ÷vÆVFvRr’ÆöDæÖW76W2‚“°¢–b‡F#ÓÓÒvFö7VÖVçG2r’ÆöDFö7VÖVçG2‚“°¢Ğ ¢òòØÈÎÉÛÂÉx^ºÎ¹9À¢6öç7BG&÷¦öæRÒFö7VÖVçBævWDVÆVÖVçD'”–B‚vG&÷×¦öæRr“°¢6öç7Bf–ÆT–çWBÒFö7VÖVçBævWDVÆVÖVçD'”–B‚vf–ÆRÖ–çWBr“°¢G&÷¦öæRæöæ6Æ–6²Ò‚’Óâf–ÆT–çWBæ6Æ–6²‚“°¢G&÷¦öæRæöæG&v÷fW"Ò†R’Óâ²Rç&WfVçDFVfVÇB‚“²G&÷¦öæRæ6Æ74Æ—7BæFB‚v&÷&FW"Ö–æF–vòÓSrÂv&rÖ–æF–vòÓSr“²Ó°¢G&÷¦öæRæöæG&vÆVfRÒ‚’Óâ²G&÷¦öæRæ6Æ74Æ—7Bç&VÖ÷fR‚v&÷&FW"Ö–æF–vòÓSrÂv&rÖ–æF–vòÓSr“²Ó°¢G&÷¦öæRæöæG&÷Ò†R’Óâ²Rç&WfVçDFVfVÇB‚“²G&÷¦öæRæ6Æ74Æ—7Bç&VÖ÷fR‚v&÷&FW"Ö–æF–vòÓSrÂv&rÖ–æF–vòÓSr“²WÆöDf–ÆW2†RæFFG&ç6fW"æf–ÆW2“²Ó°¢f–ÆT–çWBæöæ6†ævRÒ‚’ÓâWÆöDf–ÆW2†f–ÆT–çWBæf–ÆW2“° ¢7–æ2gVæ7F–öâWÆöDf–ÆW2†f–ÆW2’°¢6öç7Bç2ÒFö7VÖVçBævWDVÆVÖVçD'”–B‚wWÆöBÖç2r’çfÇVS°¢6öç7B6BÒFö7VÖVçBævWDVÆVÖVçD'”–B‚wWÆöBÖ6Br’çfÇVS°¢6öç7B&W7VÇG4F—bÒFö7VÖVçBævWDVÆVÖVçD'”–B‚wWÆöB×&W7VÇG2r“°¢6öç7B&öw&W74F—bÒFö7VÖVçBævWDVÆVÖVçD'”–B‚wWÆöB×&öw&W72r“°¢6öç7B&öw&W74&"ÒFö7VÖVçBævWDVÆVÖVçD'”–B‚w&öw&W72Ö&"r“°¢6öç7B7FGW4VÂÒFö7VÖVçBævWDVÆVÖVçD'”–B‚wWÆöB×7FGW2r“°¢ ¢&W7VÇG4F—bæ–ææW$…DÔÂÒrs°¢&öw&W74F—bæ6Æ74Æ—7Bç&VÖ÷fR‚v†–FFVâr“°¢ ¢f÷"†ÆWB“Ó²“Æf–ÆW2æÆVæwFƒ²’²²’°¢6öç7Bf–ÆRÒf–ÆW5¶•Ó°¢7FGW4VÂçFW‡D6öçFVçBÒÉx^ºÎ¹9ÂÊI¢G¶f–ÆRææÖWÒ‚G¶’³ÒòG¶f–ÆW2æÆVæwF‡Ò–°¢&öw&W74&"ç7G–ÆRçv–GF‚ÒG²†’öf–ÆW2æÆVæwF‚’£ÒV°¢ ¢6öç7Bf÷&ÔFFÒæWrf÷&ÔFF‚“°¢f÷&ÔFFæVæB‚vf–ÆRrÂf–ÆR“°¢f÷&ÔFFæVæB‚væÖW76RrÂç2“°¢–b†6B’f÷&ÔFFæVæB‚v6FVv÷'’rÂ6B“°¢ ¢G'’°¢6öç7B&W2Òv—BfWF6‚„’²r÷WÆöBrÂ²ÖWF†öC¢uõ5BrÂ&öG“¢f÷&ÔFFÒ“°¢6öç7BFFÒv—B&W2æ§6öâ‚“°¢–b†FFç7V66W72’°¢&W7VÇG4F—bæ–ææW$…DÔÂ³ÒÆF—b6Æ73Ò&&rÖw&VVâÓÓ2&÷VæFVBfÆW‚§W7F–g’Ö&WGvVVâ—FV×2Ö6VçFW"#à¢Ç7ããÆ’6Æ73Ò&f2fÖ6†V6²FW‡BÖw&VVâÓc×"Ó"#ãÂö“âG¶f–ÆRææÖWÒ‚G¶FFçFW‡EöÆVæwF‡ŞÉé“Â÷7ãà¢ÆF—cà¢Æ'WGFöâöæ6Æ–6³Ò&6‡Væ´Fö2‚G¶FFæFö5ö–GÒ’"6Æ73Ò'FW‡BÖ&ÇVRÓc†÷fW#§VæFW&Æ–æR×"Ó2#ãÆ’6Æ73Ò&f2fÖ7WB×"Ó#ãÂö“îË*ŞØ+“Âö'WGFöãà¢Æ'WGFöâöæ6Æ–6³Ò&VÖ&VDFö2‚G¶FFæFö5ö–GÒ’"6Æ73Ò'FW‡BÖw&VVâÓc†÷fW#§VæFW&Æ–æR#ãÆ’6Æ73Ò&f2fÖ'&–â×"Ó#ãÂö“îÉèN»*¹J“Âö'WGFöãà¢ÂöF—cà¢ÂöF—cæ°¢ÒVÇ6R°¢&W7VÇG4F—bæ–ææW$…DÔÂ³ÒÆF—b6Æ73Ò&&r×&VBÓÓ2&÷VæFVB#ãÆ’6Æ73Ò&f2f×F–ÖW2FW‡B×&VBÓc×"Ó"#ãÂö“âG¶f–ÆRææÖWÓ¢G¶FFæFWF–ÂÇÂ~ÈºNØÊ‚wÓÂöF—cæ°¢Ğ¢Ò6F6‚†R’°¢&W7VÇG4F—bæ–ææW$…DÔÂ³ÒÆF—b6Æ73Ò&&r×&VBÓÓ2&÷VæFVB#ãÆ’6Æ73Ò&f2f×F–ÖW2FW‡B×&VBÓc×"Ó"#ãÂö“âG¶f–ÆRææÖWÓ¢ÉŠNºYƒÂöF—cæ°¢Ğ¢Ğ¢&öw&W74&"ç7G–ÆRçv–GF‚ÒsRs°¢7FGW4VÂçFW‡D6öçFVçBÒ~É˜Nº8Âs°¢Ğ ¢7–æ2gVæ7F–öâ6‡Væ´Fö2†Fö4–B’°¢–b‚6öæf—&Ò‚~ÉÛBºËÈIÎº[ÂË*ŞØ+ÙYÈ¹Î«*È«^¸¸«˜Ãòr’’&WGW&ã°¢6öç7B&W2Òv—BfWF6‚„’¶öFö7VÖVçG2òG¶Fö4–GÒö6‡Væ¶Â¶ÖWF†öC¢uõ5BwÒ“°¢6öç7BFFÒv—B&W2æ§6öâ‚“°¢ÆW'B†FFç7V66W72òË*ŞØ+’É˜Nº8Ã¢G¶FFæ6‡Væµö6÷VçGŞ«	Æ¢~Ë*ŞØ+’ÈºNØÊ‚r“°¢ÆöDFö7VÖVçG2‚“°¢Ğ ¢7–æ2gVæ7F–öâVÖ&VDFö2†Fö4–B’°¢–b‚6öæf—&Ò‚~ÉÛBºËÈIÎº[ÂÉèN»*¹JÙYÈ¹Î«*È«^¸¸«˜Ãòr’’&WGW&ã°¢6öç7B&W2Òv—BfWF6‚„’¶öFö7VÖVçG2òG¶Fö4–GÒöVÖ&VFÂ¶ÖWF†öC¢uõ5BwÒ“°¢6öç7BFFÒv—B&W2æ§6öâ‚“°¢ÆW'B†FFç7V66W72òÉèN»*¹J’É˜Nº8Ã¢G¶FFæVÖ&VFFVEö6÷VçGŞ«	Æ¢~ÉèN»*¹J’ÈºNØÊ‚r“°¢ÆöDFö7VÖVçG2‚“°¢Ğ ¢7–æ2gVæ7F–öâFVÆWFTFö2†Fö4–B’°¢–b‚6öæf—&Ò‚~ÉÛBºËÈIÎº[ÂÈ*ŞÊ	ÎÙYÈ¹Î«*È«^¸¸«˜Ãòr’’&WGW&ã°¢v—BfWF6‚„’¶öFö7VÖVçG2òG¶Fö4–GÖÂ¶ÖWF†öC¢tDTÄUDRwÒ“°¢ÆöDFö7VÖVçG2‚“°¢Ğ ¢7–æ2gVæ7F–öâÆöDFö7VÖVçG2‚’°¢6öç7B&W2Òv—BfWF6‚„’²röFö7VÖVçG2r“°¢6öç7BFFÒv—B&W2æ§6öâ‚“°¢6öç7B7FGW46öÆ÷'2Ò²WÆöFVC¢v&r×–VÆÆ÷rÓFW‡B×–VÆÆ÷rÓƒrÂ6‡Væ¶VC¢v&rÖ&ÇVRÓFW‡BÖ&ÇVRÓƒrÂVÖ&VFFVC¢v&rÖw&VVâÓFW‡BÖw&VVâÓƒrÓ°¢Fö7VÖVçBævWDVÆVÖVçD'”–B‚vFö7VÖVçG2ÖÆ—7Br’æ–ææW$…DÔÂÒFFæFö7VÖVçG2æÖ†Fö2Óâ ¢ÆF—b6Æ73Ò&&rÖw&’ÓSÓB&÷VæFVBÖÆrfÆW‚§W7F–g’Ö&WGvVVâ—FV×2Ö6VçFW"#à¢ÆF—cà¢ÆF—b6Æ73Ò&föçBÖÖVF—VÒ#âG¶Fö2æ÷&–v–æÅöf–ÆVæÖWÓÂöF—cà¢ÆF—b6Æ73Ò'FW‡B×6ÒFW‡BÖw&’ÓS#âG¶Fö2ææÖW76WÒÂG¶Fö2çFW‡EöÆVæwF‡ŞÉéÂG¶Fö2æ6‡Væµö6÷VçBÇÂŞË*ŞØÃÂöF—cà¢ÂöF—cà¢ÆF—b6Æ73Ò&fÆW‚—FV×2Ö6VçFW'72Ö&""6Æ73Ò&&rÖ–æF–vòÓc‚Ó"&÷VæFVBÖgVÆÂG&ç6—F–öâÖÆÂ"7G–ÆSÒ'v–GFƒ£R#ãÂöF—cãÂöF—cà¢Ç–CÒ'WÆöB×7FGW2"6Æ73Ò'FW‡B×6ÒFW‡BÖw&’Óc×BÓ#ãÂ÷à¢ÂöF—cà¢ÆF—b–CÒ'WÆöB×&W7VÇG2"6Æ73Ò&×BÓB76R×’Ó"#ãÂöF—cà¢ÂöF—cà ¢ÂÒÒºËÈIÂ«HºjÂØ:ÒÒÓà¢ÆF—b–CÒ'æVÂÖFö7VÖVçG2"6Æ73Ò'F"×æVÂ†–FFVâ&r×v†—FR&÷VæFVBÖÆr6†F÷rÓb#à¢ÆF—b6Æ73Ò&fÆW‚§W7F–g’Ö&WGvVVâ—FV×2Ö6VçFW"Ö"ÓB#à¢Æƒ"6Æ73Ò'FW‡BÖÆrföçBÖ&öÆB#ãÆ’6Æ73Ò&f2fÖf–ÆRÖÇB×"Ó"FW‡BÖ–æF–vòÓc#ãÂö“îÉx^ºÎ¹9Î¹	ÂºËÈIÃÂöƒ#à¢Æ'WGFöâöæ6Æ–6³Ò&ÆöDFö7VÖVçG2‚’"6Æ73Ò&&rÖ–æF–vòÓcFW‡B×v†—FR‚ÓB’Ó"&÷VæFVB†÷fW#¦&rÖ–æF–vòÓs#ãÆ’6Æ73Ò&f2f×7–æ2ÖÇB×"Ó#ãÂö“îÈ8ºÎ«:ËšƒÂö'WGFöãà¢ÂöF—cà¢ÆF—b–CÒ&Fö7VÖVçG2ÖÆ—7B"6Æ73Ò'76R×’Ó2#ãÂöF—cà¢ÂöF—cà ¢ÂÒÒÊxÈ¹Ş»*ÉÛNÈªBØ:ÒÒÓà¢ÆF—b–CÒ'æVÂÖ¶æ÷vÆVFvR"6Æ73Ò'F"×æVÂ†–FFVâ&r×v†—FR&÷VæFVBÖÆr6†F÷rÓb#à¢ÆF—b6Æ73Ò&fÆW‚§W7F–g’Ö&WGvVVâ—FV×2Ö6VçFW"Ö"ÓB#à¢Æƒ"6Æ73Ò'FW‡BÖÆrföçBÖ&öÆB#ãÆ’6Æ73Ò&f2fÖFF&6R×"Ó"FW‡BÖ–æF–vòÓc#ãÂö“îÊxÈ¹Ş»*ÉÛNÈªBÙˆNÙš“Âöƒ#à¢Æ'WGFöâöæ6Æ–6³Ò&ÆöDæÖW76W2‚’"6Æ73Ò&&rÖ–æF–vòÓcFW‡B×v†—FR‚ÓB’Ó"&÷VæFVB†÷fW#¦&rÖ–æF–vòÓs#ãÆ’6Æ73Ò&f2f×7–æ2ÖÇB×"Ó#ãÂö“îÈ8ºÎ«:ËšƒÂö'WGFöãà¢ÂöF—cà¢ÆF—b–CÒ&æÖW76W2Öw&–B"6Æ73Ò&w&–Bw&–BÖ6öÇ2ÓBvÓBÖ"Ób#ãÂöF—cà¢ÆF—b6Æ73Ò&×BÓb#à¢Æƒ26Æ73Ò&föçBÖ&öÆBÖ"Ó"#îÙZŞºª’ºªºÓÂöƒ3à¢Ç6VÆV7B–CÒ&¶"ÖæÖW76R"6Æ73Ò&&÷&FW"&÷VæFVBÓ"Ö"ÓB"öæ6†ævSÒ&ÆöD¶æ÷vÆVFvT—FV×2‚’#ãÆ÷F–öâfÇVSÒ"#î¸JNÉèNÈªNØéÉÛNÈªBÈJØ9ÒââãÂö÷F–öããÂ÷6VÆV7Cà¢ÆF—b–CÒ&¶æ÷vÆVFvRÖ—FV×2"6Æ73Ò'76R×’Ó"Ö‚Ö‚Ó“b÷fW&fÆ÷r×’ÖWFò#ãÂöF—cà¢ÂöF—cà¢ÂöF—cà ¢ÂÒÒ«(È8’Ø:ÒÒÓà¢ÆF—b–CÒ'æVÂ×6V&6‚"6Æ73Ò'F"×æVÂ†–FFVâ&r×v†—FR&÷VæFVBÖÆr6†F÷rÓb#à¢Æƒ"6Æ73Ò'FW‡BÖÆrföçBÖ&öÆBÖ"ÓB#ãÆ’6Æ73Ò&f2f×6V&6‚×"Ó"FW‡BÖ–æF–vòÓc#ãÂö“îÈ¹ÎºzØ»«(È8“Âöƒ#à¢ÆF—b6Æ73Ò&w&–Bw&–BÖ6öÇ2Ó2vÓBÖ"ÓB#à¢ÆF—b6Æ73Ò&6öÂ×7âÓ"#à¢ÆÆ&VÂ6Æ73Ò&&Æö6²FW‡B×6ÒföçBÖÖVF—VÒÖ"Ó#î«(È8ÉkCÂöÆ&VÃà¢Æ–çWBG—SÒ'FW‡B"–CÒ'6V&6‚×VW'’"6Æ73Ò'rÖgVÆÂ&÷&FW"&÷VæFVBÓ""Æ6V†öÆFW#Ò.«(È8ÙZ¸+NÉª’âââ#à¢ÂöF—cà¢ÆF—cà¢ÆÆ&VÂ6Æ73Ò&&Æö6²FW‡B×6ÒföçBÖÖVF—VÒÖ"Ó#î¸JNÉèNÈªNØéÉÛNÈªCÂöÆ&VÃà¢Ç6VÆV7B–CÒ'6V&6‚ÖæÖW76R"6Æ73Ò'rÖgVÆÂ&÷&FW"&÷VæFVBÓ"#ãÂ÷6VÆV7Cà¢ÂöF—cà¢ÂöF—cà¢Æ'WGFöâöæ6Æ–6³Ò'W&f÷&Õ6V&6‚‚’"6Æ73Ò&&rÖ–æF–vòÓcFW‡B×v†—FR‚Ób’Ó"&÷VæFVB†÷fW#¦&rÖ–æF–vòÓs#ãÆ’6Æ73Ò&f2f×6V&6‚×"Ó#ãÂö“î«(È8“Âö'WGFöãà¢ÆF—b–CÒ'6V&6‚×&W7VÇG2"6Æ73Ò&×BÓb76R×’ÓB#ãÂöF—cà¢ÂöF—cà¢ÂöF—cà ¢Ç67&—Cà¢6öç7B’Òv‡GG3¢òö’æ‡–V‡vs"æ÷&rö’÷&rs°¢ ¢gVæ7F–öâ6†÷uF"‡F"’°¢Fö7VÖVçBçVW'•6VÆV7F÷$ÆÂ‚rçF"×æVÂr’æf÷$V6‚‡Óâæ6Æ74Æ—7BæFB‚v†–FFVâr’“°¢Fö7VÖVçBçVW'•6VÆV7F÷$ÆÂ‚rçF"Ö'Fâr’æf÷$V6‚†"Óâ²"æ6Æ74Æ—7Bç&VÖ÷fR‚v&rÖ–æF–vòÓcrÂwFW‡B×v†—FRr“²"æ6Æ74Æ—7BæFB‚v&rÖw&’Ó3r“²Ò“°¢Fö7VÖVçBævWDVÆVÖVçD'”–B‚wæVÂÒr·F"’æ6Æ74Æ—7Bç&VÖ÷fR‚v†–FFVâr“°¢Fö7VĞent.getElementById('tab-'+tab).classList.remove('bg-gray-300');
+            document.getElementById('tab-'+tab).classList.add('bg-indigo-600','text-white');
+            if(tab==='knowledge') loadNamespaces();
+            if(tab==='documents') loadDocuments();
+        }
+
+        // íŒŒì¼ ì—…ë¡œë“œ
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        dropZone.onclick = () => fileInput.click();
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('border-indigo-500','bg-indigo-50'); };
+        dropZone.ondragleave = () => { dropZone.classList.remove('border-indigo-500','bg-indigo-50'); };
+        dropZone.ondrop = (e) => { e.preventDefault(); dropZone.classList.remove('border-indigo-500','bg-indigo-50'); uploadFiles(e.dataTransfer.files); };
+        fileInput.onchange = () => uploadFiles(fileInput.files);
+
+        async function uploadFiles(files) {
+            const ns = document.getElementById('upload-ns').value;
+            const cat = document.getElementById('upload-cat').value;
+            const resultsDiv = document.getElementById('upload-results');
+            const progressDiv = document.getElementById('upload-progress');
+            const progressBar = document.getElementById('progress-bar');
+            const statusEl = document.getElementById('upload-status');
+            
+            resultsDiv.innerHTML = '';
+            progressDiv.classList.remove('hidden');
+            
+            for(let i=0; i<files.length; i++) {
+                const file = files[i];
+                statusEl.textContent = `ì—…ë¡œë“œ ì¤‘: ${file.name} (${i+1}/${files.length})`;
+                progressBar.style.width = `${(i/files.length)*100}%`;
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('namespace', ns);
+                if(cat) formData.append('category', cat);
+                
+                try {
+                    const res = await fetch(API+'/upload', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if(data.success) {
+                        resultsDiv.innerHTML += `<div class="bg-green-100 p-3 rounded flex justify-between items-center">
+                            <span><i class="fas fa-check text-green-600 mr-2"></i>${file.name} (${data.text_length}ì)</span>
+                            <div>
+                                <button onclick="chunkDoc(${data.doc_id})" class="text-blue-600 hover:underline mr-3"><i class="fas fa-cut mr-1"></i>ì²­í‚¹</button>
+                                <button onclick="embedDoc(${data.doc_id})" class="text-green-600 hover:underline"><i class="fas fa-brain mr-1"></i>ì„ë² ë”©</button>
+                            </div>
+                        </div>`;
+                    } else {
+                        resultsDiv.innerHTML += `<div class="bg-red-100 p-3 rounded"><i class="fas fa-times text-red-600 mr-2"></i>${file.name}: ${data.detail || 'ì‹¤íŒ¨'}</div>`;
+                    }
+                } catch(e) {
+                    resultsDiv.innerHTML += `<div class="bg-red-100 p-3 rounded"><i class="fas fa-times text-red-600 mr-2"></i>${file.name}: ì˜¤ë¥˜</div>`;
+                }
+            }
+            progressBar.style.width = '100%';
+            statusEl.textContent = 'ì™„ë£Œ!';
+        }
+
+        async function chunkDoc(docId) {
+            if(!confirm('ì´ ë¬¸ì„œë¥¼ ì²­í‚¹í•˜ì‹œê² ìŠµë‹ˆê¹Œ?')) return;
+            const res = await fetch(API+`/documents/${docId}/chunk`, {method:'POST'});
+            const data = await res.json();
+            alert(data.success ? `ì²­í‚¹ ì™„ë£Œ: ${data.chunk_count}ê°œ` : 'ì²­í‚¹ ì‹¤íŒ¨');
+            loadDocuments();
+        }
+
+        async function embedDoc(docId) {
+            if(!confirm('ì´ ë¬¸ì„œë¥¼ ì„ë² ë”©í•˜ì‹œê² ìŠµë‹ˆê¹Œ?')) return;
+            const res = await fetch(API+`/documents/${docId}/embed`, {method:'POST'});
+            const data = await res.json();
+            alert(data.success ? `ì„ë² ë”© ì™„ë£Œ: ${data.embedded_count}ê°œ` : 'ì„ë² ë”© ì‹¤íŒ¨');
+            loadDocuments();
+        }
+
+        async function deleteDoc(docId) {
+            if(!confirm('ì´ ë¬¸ì„œë¥¼ ì‚­ì œí•˜ì‹œê² ìŠµë‹ˆê¹Œ?')) return;
+            await fetch(API+`/documents/${docId}`, {method:'DELETE'});
+            loadDocuments();
+        }
+
+        async function loadDocuments() {
+            const res = await fetch(API+'/documents');
+            const data = await res.json();
+            const statusColors = { uploaded:'bg-yellow-100 text-yellow-800', chunked:'bg-blue-100 text-blue-800', embedded:'bg-green-100 text-green-800' };
+            document.getElementById('documents-list').innerHTML = data.documents.map(doc => `
+                <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
+                    <div>
+                        <div class="font-medium">${doc.original_filename}</div>
+                        <div class="text-sm text-gray-500">${doc.namespace} | ${doc.text_length}ì | ${doc.chunk_count || 0}ì²µí¬</div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="px-2 py-1 rounded text-xs ${statusColors[doc.status] || 'bg-gray-100'}">${doc.status}</span>
+                        ${doc.status==='uploaded'?`<button onclick="chunkDoc(${doc.id})" class="text-blue-600 hover:underline text-sm"><i class="fas fa-cut"></i></button>`:''}
+                        ${doc.status==='chunked'?`<button onclick="embedDoc(${doc.id})" class="text-green-600 hover:underline text-sm"><i class="fas fa-brain"></i></button>`:''}
+                        <button onclick="deleteDoc(${doc.id})" class="text-red-500 hover:underline text-sm"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('') || '<div class="text-gray-500 text-center">ë¬¸ì„œ ì—†ìŒ</div>';
+        }
+
+        async function loadNamespaces() {
+            const res = await fetch(API+'/namespaces');
+            const data = await res.json();
+            document.getElementById('namespaces-grid').innerHTML = data.namespaces.map(ns => 
+                `<div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-lg p-4 shadow"><div class="text-2xl font-bold">${ns.count}</div><div class="text-sm opacity-80">${ns.namespace}</div></div>`
+            ).join('');
+            const opts = '<option value="">ì„ íƒ...</option>' + data.namespaces.map(ns => `<option value="${ns.namespace}">${ns.namespace} (${ns.count})</option>`).join('');
+            document.getElementById('kb-namespace').innerHTML = opts;
+            document.getElementById('search-namespace').innerHTML = data.namespaces.map(ns => `<option value="${ns.namespace}">${ns.namespace}</option>`).join('');
+        }
+
+        async function loadKnowledgeItems() {
+            const ns = document.getElementById('kb-namespace').value;
+            if(!ns) return;
+            const res = await fetch(API+`/list/${ns}`);
+            const data = await res.json();
+            document.getElementById('knowledge-items').innerHTML = data.items.map(item => 
+                `<div class="bg-gray-50 p-3 rounded flex justify-between"><div><div class="font-medium">${item.title}</div><div class="text-sm text-gray-500">${item.preview}...</div></div><button onclick="deleteKB(${item.id})" class="text-red-500"><i class="fas fa-trash"></i></button></div>`
+            ).join('') || '<div class="text-gray-500 text-center">í•­ëª© ì—†ìŒ</div>';
+        }
+
+        async function deleteKB(id) { if(!confirm('ì‚­ì œ?'))return; await fetch(API+`/${id}`,{method:'DELETE'}); loadKnowledgeItems(); loadNamespaces(); }
+
+        async function performSearch() {
+            const q = document.getElementById('search-query').value;
+            const ns = document.getElementById('search-namespace').value;
+            if(!q) { alert('ê²€ìƒ‰ì–´ ì…ë ¥'); return; }
+            const res = await fetch(API+'/search', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({query:q, namespace:ns, top_k:5}) });
+            const data = await res.json();
+            document.getElementById('search-results').innerHTML = data.results.map((r,i) => 
+                `<div class="bg-gray-50 p-4 rounded-lg"><div class="flex justify-between mb-2"><span class="font-bold">#${i+1} ${r.title}</span><span class="text-sm text-indigo-600">${(r.similarity*100).toFixed(1)}%</span></div><div class="text-sm text-gray-600">${r.content.substring(0,300)}...</div></div>`
+            ).join('') || '<div class="text-gray-500 text-center">ê²°ê³¼ ì—†ìŒ</div>';
+        }
+
+        document.getElementById('search-query').addEventListener('keypress', e => { if(e.key==='Enter') performSearch(); });
+        loadNamespaces();
+    </script>
+</body>
+</html>

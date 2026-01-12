@@ -1,0 +1,2853 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 콘텐츠 제작소 - 혜화72</title>
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/gridstack@10.3.1/dist/gridstack.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="help-panel.css">
+    <link href="https://cdn.jsdelivr.net/npm/gridstack@10.3.1/dist/gridstack-extra.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4799eb;
+            --primary-light: #6fb5f3;
+            --secondary: #818cf8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-light: #f6f7f8;
+            --bg-card: rgba(255, 255, 255, 0.65);
+            --bg-card-hover: rgba(255, 255, 255, 0.85);
+            --text-primary: #111418;
+            --text-muted: #64748b;
+            --border-color: rgba(255, 255, 255, 0.6);
+            --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.07);
+            --shadow-glass-hover: 0 12px 40px rgba(71, 153, 235, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Pretendard Variable', -apple-system, sans-serif;
+            background-color: #f6f7f8;
+            background-image: radial-gradient(at 0% 0%, hsla(215, 85%, 92%, 1) 0, transparent 50%), 
+                              radial-gradient(at 100% 0%, hsla(260, 85%, 94%, 1) 0, transparent 50%), 
+                              radial-gradient(at 50% 50%, hsla(210, 80%, 97%, 1) 0, transparent 50%), 
+                              radial-gradient(at 0% 100%, hsla(260, 85%, 94%, 1) 0, transparent 50%), 
+                              radial-gradient(at 100% 100%, hsla(215, 85%, 92%, 1) 0, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+            padding: 10px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            background: rgba(71, 153, 235, 0.1);
+        }
+
+        .page-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .page-title i {
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(71, 153, 235, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(71, 153, 235, 0.35);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 0.8rem;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary);
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 52px);
+        }
+
+        .sidebar {
+            width: 320px;
+            min-width: 200px;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .sidebar-resize-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            cursor: ew-resize;
+            background: transparent;
+            transition: background 0.3s;
+            z-index: 10;
+        }
+
+        .sidebar-resize-handle:hover,
+        .sidebar-resize-handle.active {
+            background: var(--primary);
+        }
+
+        .sidebar-header {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .search-box {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(71, 153, 235, 0.1);
+            background: white;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .app-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .app-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .app-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .app-list::-webkit-scrollbar-thumb {
+            background: rgba(71, 153, 235, 0.3);
+            border-radius: 3px;
+        }
+
+        .app-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(71, 153, 235, 0.5);
+        }
+
+        .app-category {
+            margin-bottom: 6px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        .category-header:hover {
+            background: rgba(71, 153, 235, 0.08);
+        }
+
+        .category-toggle {
+            width: 20px;
+            transition: transform 0.3s;
+            color: var(--text-muted);
+        }
+
+        .category-toggle.open {
+            transform: rotate(90deg);
+        }
+
+        .category-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            margin-right: 10px;
+        }
+
+        .category-name {
+            flex: 1;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .category-count {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: rgba(71, 153, 235, 0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-right: 8px;
+            font-weight: 600;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 2px;
+        }
+
+        .category-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: all 0.3s;
+        }
+
+        .category-btn:hover {
+            background: rgba(71, 153, 235, 0.1);
+            color: var(--primary);
+        }
+
+        .app-items {
+            display: none;
+            padding: 4px 8px 8px;
+        }
+
+        .app-items.open {
+            display: block;
+        }
+
+        .app-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 3px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .app-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(71, 153, 235, 0.2);
+            transform: translateX(4px);
+        }
+
+        .app-item:active {
+            transform: scale(0.98);
+        }
+        .app-item .add-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            margin-left: auto;
+            opacity: 0.8;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(71, 153, 235, 0.25);
+        }
+
+        .app-item .add-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(71, 153, 235, 0.4);
+        }
+
+        .app-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .app-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .app-item-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .app-item-desc {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .app-item-actions {
+            display: flex;
+            gap: 2px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .app-item:hover .app-item-actions {
+            opacity: 1;
+        }
+
+        .workflow-section {
+            padding: 8px 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .workflow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .workflow-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .workflow-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .workflow-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .workflow-item:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(71, 153, 235, 0.15);
+        }
+
+        .content-area {
+            flex: 1;
+            overflow: hidden;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-stack {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .grid-stack-item-content {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .grid-stack-item-content:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(71, 153, 235, 0.15);
+            border-color: rgba(71, 153, 235, 0.3);
+        }
+
+        .widget-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.3);
+            cursor: grab;
+        }
+
+        .widget-header:active {
+            cursor: grabbing;
+        }
+
+        .widget-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-right: 10px;
+        }
+
+        .widget-title {
+            flex: 1;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .widget-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .widget-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: all 0.3s;
+        }
+
+        .widget-btn:hover {
+            background: rgba(71, 153, 235, 0.1);
+            color: var(--primary);
+        }
+
+        .widget-content {
+            flex: 1;
+            padding: 12px;
+            overflow: auto;
+        }
+
+        .widget-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .widget-content::-webkit-scrollbar-thumb {
+            background: rgba(71, 153, 235, 0.2);
+            border-radius: 2px;
+        }
+
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 14px 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .shortcut-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(71, 153, 235, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(71, 153, 235, 0.12);
+        }
+
+        .shortcut-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .shortcut-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .shortcut-folder {
+            background: linear-gradient(135deg, rgba(71, 153, 235, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%);
+            border: 2px dashed rgba(71, 153, 235, 0.3);
+        }
+
+        .shortcut-folder:hover {
+            background: linear-gradient(135deg, rgba(71, 153, 235, 0.15) 0%, rgba(129, 140, 248, 0.15) 100%);
+            border-color: var(--primary);
+        }
+
+        .shortcut-folder .shortcut-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text-primary);
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(71, 153, 235, 0.1);
+            background: white;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(71, 153, 235, 0.1);
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-option:hover {
+            transform: scale(1.15);
+        }
+
+        .color-option.selected {
+            border-color: var(--text-primary);
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .icon-picker::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .icon-picker::-webkit-scrollbar-thumb {
+            background: rgba(71, 153, 235, 0.2);
+            border-radius: 2px;
+        }
+
+        .icon-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .icon-option:hover {
+            background: rgba(71, 153, 235, 0.1);
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .icon-option.selected {
+            background: var(--primary);
+            color: var(--text-primary);
+            transform: scale(1.1);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--primary);
+        }
+
+        .context-menu {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            padding: 6px;
+            min-width: 160px;
+            z-index: 2500;
+            display: none;
+        }
+
+        .context-menu.show {
+            display: block;
+            animation: fadeIn 0.15s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .context-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .context-menu-item:hover {
+            background: rgba(71, 153, 235, 0.1);
+            color: var(--primary);
+        }
+
+        .context-menu-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.05);
+            margin: 4px 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background: rgba(71, 153, 235, 0.15);
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .badge-purple {
+            background: rgba(129, 140, 248, 0.15);
+            color: var(--secondary);
+        }
+
+        .gs-placeholder {
+            background: rgba(71, 153, 235, 0.1) !important;
+            border: 2px dashed var(--primary) !important;
+            border-radius: 16px !important;
+        }
+
+        .gs-preview-helper {
+            background: rgba(71, 153, 235, 0.2) !important;
+            border: 2px solid var(--primary) !important;
+            border-radius: 16px !important;
+        }
+
+        .bg-gradient-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .bg-gradient-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .bg-gradient-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .bg-gradient-4 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .bg-gradient-5 {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .bg-purple {
+            background: linear-gradient(135deg, #a78bfa 0%, #818cf8 100%);
+            color: var(--text-primary);
+        }
+
+        .bg-pink {
+            background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+            color: var(--text-primary);
+        }
+
+        .bg-blue {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            color: var(--text-primary);
+        }
+
+        .bg-green {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: var(--text-primary);
+        }
+
+        .bg-orange {
+            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+            color: var(--text-primary);
+        }
+
+        .bg-cyan {
+            background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
+            color: var(--text-primary);
+        }
+
+        .bg-red {
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+            color: var(--text-primary);
+        }
+
+        .bg-indigo {
+            background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+            color: var(--text-primary);
+        }
+
+        .gs-24>.grid-stack-item {
+            width: 4.167%;
+        }
+
+        .gs-24>.grid-stack-item[gs-w="1"] { width: 4.167%; }
+        .gs-24>.grid-stack-item[gs-w="2"] { width: 8.333%; }
+        .gs-24>.grid-stack-item[gs-w="3"] { width: 12.5%; }
+        .gs-24>.grid-stack-item[gs-w="4"] { width: 16.667%; }
+        .gs-24>.grid-stack-item[gs-w="5"] { width: 20.833%; }
+        .gs-24>.grid-stack-item[gs-w="6"] { width: 25%; }
+        .gs-24>.grid-stack-item[gs-w="7"] { width: 29.167%; }
+        .gs-24>.grid-stack-item[gs-w="8"] { width: 33.333%; }
+        .gs-24>.grid-stack-item[gs-w="9"] { width: 37.5%; }
+        .gs-24>.grid-stack-item[gs-w="10"] { width: 41.667%; }
+        .gs-24>.grid-stack-item[gs-w="11"] { width: 45.833%; }
+        .gs-24>.grid-stack-item[gs-w="12"] { width: 50%; }
+        .gs-24>.grid-stack-item[gs-w="13"] { width: 54.167%; }
+        .gs-24>.grid-stack-item[gs-w="14"] { width: 58.333%; }
+        .gs-24>.grid-stack-item[gs-w="15"] { width: 62.5%; }
+        .gs-24>.grid-stack-item[gs-w="16"] { width: 66.667%; }
+        .gs-24>.grid-stack-item[gs-w="17"] { width: 70.833%; }
+        .gs-24>.grid-stack-item[gs-w="18"] { width: 75%; }
+        .gs-24>.grid-stack-item[gs-w="19"] { width: 79.167%; }
+        .gs-24>.grid-stack-item[gs-w="20"] { width: 83.333%; }
+        .gs-24>.grid-stack-item[gs-w="21"] { width: 87.5%; }
+        .gs-24>.grid-stack-item[gs-w="22"] { width: 91.667%; }
+        .gs-24>.grid-stack-item[gs-w="23"] { width: 95.833%; }
+        .gs-24>.grid-stack-item[gs-w="24"] { width: 100%; }
+
+        .help-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text-primary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 20px rgba(71, 153, 235, 0.4);
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .help-btn:hover {
+            transform: scale(1.1) translateY(-2px);
+            box-shadow: 0 10px 30px rgba(71, 153, 235, 0.5);
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--text-primary);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(71, 153, 235, 0.3);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                z-index: 1001;
+                transition: left 0.3s ease;
+                width: 85%;
+                max-width: 320px;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar-toggle {
+                display: flex;
+            }
+
+            .content-area {
+                padding: 12px;
+            }
+
+            .shortcut-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.active {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .status-dot.inactive {
+            background: var(--text-muted);
+        }
+
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-left">
+            <a href="index.html" class="back-btn"><i class="bi bi-arrow-left"></i> 포털</a>
+            <h1 class="page-title"><i class="bi bi-stars"></i> AI 콘텐츠 제작소</h1>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="toggleSettings()" title="설정"><i class="bi bi-gear"></i></button>
+            <button class="btn btn-secondary" onclick="toggleHelpPanel()" title="도움말"><i class="bi bi-question-circle"></i></button>
+            <a href="url-helper.html" class="btn btn-secondary" target="_blank" title="URL 경로 도우미"><i
+                    class="bi bi-link-45deg"></i> URL 도우미</a>
+            <button class="btn btn-secondary" onclick="openFolderModal()"><i class="bi bi-folder-plus"></i> 폴더</button>
+            <button class="btn btn-secondary" onclick="openWorkflowModal()"><i class="bi bi-diagram-3"></i>
+                워크플로우</button>
+            <button class="btn btn-secondary" onclick="toggleEditMode()"><i class="bi bi-pencil"></i> <span
+                    id="editModeText">편집</span></button>
+            <button class="btn btn-secondary" onclick="resetLayout()"><i
+                    class="bi bi-arrow-counterclockwise"></i></button>
+            <button class="btn btn-primary" onclick="saveLayout()"><i class="bi bi-download"></i> 저장</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-resize-handle" id="resizeHandle"></div>
+            <div class="sidebar-header">
+                <span class="sidebar-title">🎨 위젯 라이브러리</span>
+                <button class="btn btn-sm btn-secondary" onclick="openCategoryModal()"><i
+                        class="bi bi-plus"></i></button>
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="앱 검색..." oninput="filterApps()">
+            </div>
+            <div class="app-list" id="appList"></div>
+            <div class="workflow-section">
+                <div class="workflow-header">
+                    <span class="workflow-title"><i class="bi bi-diagram-3"></i> 내 워크플로우</span>
+                    <button class="btn btn-sm btn-icon btn-secondary" onclick="openWorkflowModal()"><i
+                            class="bi bi-plus"></i></button>
+                </div>
+                <div class="workflow-list" id="workflowList"></div>
+            </div>
+            <div class="shortcut-section">
+                <div class="shortcut-header">
+                    <span class="shortcut-title"><i class="bi bi-link-45deg"></i> 바로가기</span>
+                    <button class="btn btn-sm btn-icon btn-secondary" onclick="openShortcutModal()"><i
+                            class="bi bi-plus"></i></button>
+                </div>
+                <div class="shortcut-list" id="shortcutList"></div>
+            </div>
+        </aside>
+
+        <div class="grid-container">
+            <div class="grid-stack" id="mainGrid"></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 모달들 -->
+    <div class="modal" id="appModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="appModalTitle">앱 추가</h3>
+                <button class="modal-close" onclick="closeAppModal()"><i class="bi bi-x"></i></button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">카테고리</label>
+                <select class="form-select" id="appCategory"></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">앱 이름 *</label>
+                <input type="text" class="form-input" id="appName" placeholder="예: 경제학 작가">
+            </div>
+            <div class="form-group">
+                <label class="form-label">설명</label>
+                <input type="text" class="form-input" id="appDesc" placeholder="예: 경제 뉴스를 쉽게 해설">
+            </div>
+            <div class="form-group">
+                <label class="form-label">연결 URL</label>
+                <input type="text" class="form-input" id="appUrl" placeholder="예: economy_script.html">
+            </div>
+            <div class="form-group">
+                <label class="form-label">n8n 워크플로우 ID</label>
+                <input type="text" class="form-input" id="appN8nId" placeholder="예: 1234">
+            </div>
+            <div class="form-group">
+                <label class="form-label">색상</label>
+                <div class="color-picker" id="colorPicker"></div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">아이콘</label>
+                <div class="icon-picker" id="iconPicker"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeAppModal()">취소</button>
+                <button class="btn btn-primary" onclick="saveApp()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">카테고리 추가</h3>
+                <button class="modal-close" onclick="closeCategoryModal()"><i class="bi bi-x"></i></button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">카테고리 이름 *</label>
+                <input type="text" class="form-input" id="catName" placeholder="예: AI 음악가">
+            </div>
+            <div class="form-group">
+                <label class="form-label">색상</label>
+                <div class="color-picker" id="catColorPicker"></div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">아이콘</label>
+                <div class="icon-picker" id="catIconPicker"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeCategoryModal()">취소</button>
+                <button class="btn btn-primary" onclick="saveCategory()">추가</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="shortcutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">바로가기 추가</h3>
+                <button class="modal-close" onclick="closeShortcutModal()"><i class="bi bi-x"></i></button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">URL *</label>
+                <input type="url" class="form-input" id="shortcutUrl" placeholder="https://"
+                    oninput="fetchShortcutInfo()">
+            </div>
+            <div class="form-group">
+                <label class="form-label">이름 *</label>
+                <input type="text" class="form-input" id="shortcutName" placeholder="사이트 이름">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeShortcutModal()">취소</button>
+                <button class="btn btn-primary" onclick="addShortcut()">추가</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="workflowModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">워크플로우 만들기</h3>
+                <button class="modal-close" onclick="closeWorkflowModal()"><i class="bi bi-x"></i></button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">워크플로우 이름 *</label>
+                <input type="text" class="form-input" id="wfName" placeholder="예: 경제 콘텐츠 자동화">
+            </div>
+            <div class="form-group">
+                <label class="form-label">앱 선택 (순서대로)</label>
+                <div id="wfAppSelector"
+                    style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto;"></div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">선택된 파이프라인</label>
+                <div id="wfPipeline"
+                    style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:40px;background:var(--bg-dark);padding:8px;border-radius:6px;">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeWorkflowModal()">취소</button>
+                <button class="btn btn-primary" onclick="saveWorkflow()">생성</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 폴더 모달 -->
+    <div class="modal" id="folderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="bi bi-folder-plus" style="margin-right:8px;"></i>폴더 만들기</h3>
+                <button class="modal-close" onclick="closeFolderModal()"><i class="bi bi-x"></i></button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">폴더 이름 *</label>
+                <input type="text" class="form-input" id="folderName" placeholder="예: 자주 쓰는 앱">
+            </div>
+            <div class="form-group">
+                <label class="form-label">폴더 색상</label>
+                <input type="color" id="folderColor" value="#fbbf24"
+                    style="width:50px;height:32px;border:none;border-radius:6px;cursor:pointer;">
+            </div>
+            <div class="form-group">
+                <label class="form-label">포함할 항목 선택</label>
+                <div id="folderItemSelector"
+                    style="display:flex;flex-direction:column;gap:6px;max-height:250px;overflow-y:auto;background:var(--bg-dark);padding:12px;border-radius:8px;">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeFolderModal()">취소</button>
+                <button class="btn btn-primary" onclick="saveFolder()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gridstack@10.3.1/dist/gridstack-all.min.js"></script>
+    <script src="help-panel.js"></script>
+    <script>
+        const STORAGE_KEY = 'content-studio-v3';
+        const RAG_API = 'https://rag.hyehwa72.org';
+        const N8N_API = 'https://n8n.hyehwa72.org';
+
+        const COLORS = ['bg-purple', 'bg-pink', 'bg-blue', 'bg-green', 'bg-orange', 'bg-red', 'bg-cyan', 'bg-indigo', 'bg-teal', 'bg-rose'];
+        const ICONS = ['bi-pen', 'bi-pencil', 'bi-book', 'bi-journal-text', 'bi-file-text', 'bi-graph-up-arrow', 'bi-currency-dollar', 'bi-house', 'bi-building', 'bi-heart-pulse', 'bi-emoji-smile', 'bi-moon-stars', 'bi-lightning', 'bi-palette', 'bi-brush', 'bi-image', 'bi-camera', 'bi-film', 'bi-camera-video', 'bi-play-circle', 'bi-youtube', 'bi-music-note', 'bi-robot', 'bi-cpu', 'bi-gear', 'bi-sliders', 'bi-magic', 'bi-stars', 'bi-fire', 'bi-rocket', 'bi-trophy', 'bi-bar-chart', 'bi-clock-history', 'bi-calendar', 'bi-database', 'bi-diagram-3', 'bi-link-45deg', 'bi-globe'];
+
+        const DEFAULT_CATEGORIES = [
+            { id: 'ai-writer', name: 'AI 작가', icon: 'bi-pen', color: 'bg-purple' },
+            { id: 'ai-artist', name: 'AI 화가', icon: 'bi-palette', color: 'bg-pink' },
+            { id: 'ai-thumbnail', name: 'AI 썸네일', icon: 'bi-image', color: 'bg-orange' },
+            { id: 'ai-video', name: 'AI 영상', icon: 'bi-camera-video', color: 'bg-cyan' },
+            { id: 'dashboard', name: '대시보드', icon: 'bi-speedometer2', color: 'bg-blue' },
+            { id: 'knowledge', name: '지식창고', icon: 'bi-database', color: 'bg-teal' }
+        ];
+
+        const DEFAULT_APPS = [
+            { id: 'economy-writer', catId: 'ai-writer', name: '경제학 작가', desc: '경제 뉴스 해설', icon: 'bi-graph-up-arrow', color: 'bg-purple', url: 'economy_script.html' },
+            { id: 'realestate-writer', catId: 'ai-writer', name: '부동산 작가', desc: '부동산 정보', icon: 'bi-house', color: 'bg-green' },
+            { id: 'webnovel-writer', catId: 'ai-writer', name: '웹소설 작가', desc: '로맨스/판타지', icon: 'bi-book', color: 'bg-pink' },
+            { id: 'martial-writer', catId: 'ai-writer', name: '무협 작가', desc: '무협 스토리', icon: 'bi-moon-stars', color: 'bg-red' },
+            { id: 'horror-writer', catId: 'ai-writer', name: '괴담 작가', desc: '공포/미스터리', icon: 'bi-lightning', color: 'bg-indigo' },
+            { id: 'health-writer', catId: 'ai-writer', name: '건강 작가', desc: '시니어 건강', icon: 'bi-heart-pulse', color: 'bg-teal' },
+            { id: 'webtoon-artist', catId: 'ai-artist', name: '웹툰 화가', desc: '웹툰 스타일', icon: 'bi-brush', color: 'bg-pink' },
+            { id: 'realistic-artist', catId: 'ai-artist', name: '실사 화가', desc: '포토리얼', icon: 'bi-camera', color: 'bg-blue' },
+            { id: 'ghibli-artist', catId: 'ai-artist', name: '지브리 화가', desc: '지브리 스타일', icon: 'bi-stars', color: 'bg-green' },
+            { id: 'comics-artist', catId: 'ai-artist', name: '코믹스 화가', desc: '만화 스타일', icon: 'bi-palette', color: 'bg-orange' },
+            { id: 'realistic-thumb', catId: 'ai-thumbnail', name: '실사 썸네일', desc: '포토 썸네일', icon: 'bi-image', color: 'bg-orange' },
+            { id: 'webtoon-thumb', catId: 'ai-thumbnail', name: '웹툰 썸네일', desc: '웹툰풍', icon: 'bi-card-image', color: 'bg-pink' },
+            { id: 'ghibli-thumb', catId: 'ai-thumbnail', name: '지브리 썸네일', desc: '지브리풍', icon: 'bi-flower1', color: 'bg-teal' },
+            { id: 'sora-director', catId: 'ai-video', name: 'Sora2 감독', desc: 'OpenAI Sora', icon: 'bi-camera-video', color: 'bg-cyan' },
+            { id: 'veo-director', catId: 'ai-video', name: 'VEO3 감독', desc: 'Google VEO', icon: 'bi-play-circle', color: 'bg-red' },
+            { id: 'runway-director', catId: 'ai-video', name: 'Runway 감독', desc: 'Runway Gen-3', icon: 'bi-film', color: 'bg-indigo' },
+            { id: 'stats-widget', catId: 'dashboard', name: '통계', desc: '대본 현황', icon: 'bi-bar-chart', color: 'bg-blue', type: 'stats' },
+            { id: 'recent-widget', catId: 'dashboard', name: '최근 대본', desc: '최근 생성', icon: 'bi-clock-history', color: 'bg-orange', type: 'recent' },
+            { id: 'quick-widget', catId: 'dashboard', name: '빠른 실행', desc: '자주 쓰는 기능', icon: 'bi-lightning', color: 'bg-pink', type: 'quick' },
+            { id: "rag-register", catId: "knowledge", name: "지식 등록", desc: "파일/URL/텍스트 통합", icon: "bi-database-add", color: "bg-teal", url: "https://n8n.hyehwa72.org/form/rag-upload-form" },
+            { id: "rag-search", catId: "knowledge", name: "지식 검색", desc: "RAG 검색 테스트", icon: "bi-search", color: "bg-purple", url: "rag.html" }
+        ];
+
+        const DEFAULT_LAYOUT = [
+            { x: 0, y: 0, w: 2, h: 2, appId: 'economy-writer' },
+            { x: 2, y: 0, w: 2, h: 2, appId: 'webtoon-artist' },
+            { x: 4, y: 0, w: 2, h: 2, appId: 'sora-director' },
+            { x: 6, y: 0, w: 4, h: 2, appId: 'stats-widget' },
+            { x: 0, y: 2, w: 6, h: 3, appId: 'recent-widget' },
+            { x: 6, y: 2, w: 4, h: 2, appId: 'quick-widget' }
+        ];
+
+        let grid, editMode = false;
+        let categories = [], apps = [], shortcuts = [], workflows = [], folders = [];
+        let openCategories = {};
+        let editingAppId = null;
+        let editingWorkflowId = null;
+        let selectedColor = 'bg-purple', selectedIcon = 'bi-stars';
+        let catSelectedColor = 'bg-purple', catSelectedIcon = 'bi-folder';
+        let wfSelectedApps = [];
+
+        // 위젯 삭제 함수
+        window.deleteWidget = function (btn) {
+            const gridItem = btn.closest('.grid-stack-item');
+            if (gridItem) {
+                grid.removeWidget(gridItem);
+                showToast('삭제됨', 'info');
+            }
+        };
+
+        // 앱을 그리드에 추가하는 핵심 함수
+        window.addAppToGrid = function (appId) {
+            console.log('Adding app to grid:', appId);
+            const app = apps.find(a => a.id === appId);
+            if (!app) {
+                showToast('앱을 찾을 수 없습니다', 'error');
+                return;
+            }
+
+            let content;
+            if (app.type === 'stats') content = createStatsWidget();
+            else if (app.type === 'recent') content = createRecentWidget();
+            else if (app.type === 'quick') content = createQuickWidget();
+            else content = createAppWidget(app);
+
+            const w = grid.addWidget({
+                w: app.type ? 4 : 2,
+                h: app.type ? 2 : 2,
+                id: `app-${Date.now()}`,
+                content
+            });
+
+            if (w?.gridstackNode) w.gridstackNode.appId = appId;
+            saveLayout();
+
+            if (app.type === 'stats') loadStats();
+            if (app.type === 'recent') loadRecentScripts();
+
+            showToast(`"${app.name}" 추가됨`, 'success');
+        };
+
+        // === 이벤트 위임 핸들러 (안정적인 클릭 처리) ===
+        document.addEventListener('DOMContentLoaded', function () {
+            // 사이드바 클릭 이벤트 위임 - 버튼 액션(add/edit/delete)용
+            document.querySelector('.sidebar').addEventListener('click', function (e) {
+                const target = e.target.closest('[data-action]');
+                if (!target) return;
+
+                const action = target.dataset.action;
+
+                // open 액션은 더블클릭에서 처리 (여기서는 무시)
+                if (action === 'open') return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                const appId = target.dataset.appId;
+                const shortcutId = target.dataset.shortcutId;
+
+                console.log('Sidebar button click:', { action, appId, shortcutId });
+
+                // 앱 관련 액션 (add/edit/delete만)
+                if (appId) {
+                    switch (action) {
+                        case 'add': addAppToGrid(appId); break;
+                        case 'edit': editApp(appId); break;
+                        case 'delete': deleteApp(appId); break;
+                    }
+                }
+
+                // 바로가기 관련 액션 (add만)
+                if (shortcutId && action === 'add') {
+                    addShortcutToGrid(shortcutId);
+                }
+            });
+
+            // 사이드바 더블클릭 이벤트 - 열기(open) 액션용
+            document.querySelector('.sidebar').addEventListener('dblclick', function (e) {
+                const target = e.target.closest('[data-action="open"]');
+                if (!target) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                const appId = target.dataset.appId;
+                const shortcutId = target.dataset.shortcutId;
+                const url = target.dataset.url;
+
+                console.log('Sidebar dblclick open:', { appId, shortcutId, url });
+
+                // 앱 열기
+                if (appId) {
+                    openApp(appId);
+                }
+
+                // 바로가기 열기
+                if (shortcutId && url) {
+                    const decodedUrl = decodeURIComponent(url);
+                    safeOpenUrl(decodedUrl);
+                }
+            });
+
+            // 그리드 클릭 이벤트 위임 - 버튼 액션용 (삭제, 폴더 추가 등)
+            document.getElementById('mainGrid').addEventListener('click', function (e) {
+                // 삭제 버튼
+                const deleteBtn = e.target.closest('.widget-delete-btn');
+                if (deleteBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    deleteWidget(deleteBtn);
+                    return;
+                }
+
+                // 워크플로우 실행 버튼
+                const runBtn = e.target.closest('.workflow-run-btn[data-workflow-id]');
+                if (runBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    runWorkflow(runBtn.dataset.workflowId);
+                    return;
+                }
+
+                // 폴더에 항목 추가
+                const addToFolderBtn = e.target.closest('[data-action="addToFolder"]');
+                if (addToFolderBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const folderId = addToFolderBtn.dataset.folderId;
+                    openAddToFolderModal(folderId);
+                    return;
+                }
+
+                // 폴더 헤더 클릭 (편집)
+                const folderHeader = e.target.closest('[data-action="editFolder"]');
+                if (folderHeader) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const folderId = folderHeader.dataset.folderId;
+                    editFolder(folderId);
+                    return;
+                }
+            });
+
+            // 그리드 더블클릭 이벤트 - 앱/바로가기 열기용
+            document.getElementById('mainGrid').addEventListener('dblclick', function (e) {
+                // 빠른 실행 버튼
+                const quickBtn = e.target.closest('.quick-btn[data-url]');
+                if (quickBtn) {
+                    e.preventDefault();
+                    const url = quickBtn.dataset.url;
+                    console.log('Quick btn dblclick:', url);
+                    safeOpenUrl(url);
+                    return;
+                }
+
+                // 앱 카드 더블클릭
+                const appCard = e.target.closest('.app-card[data-app-id]');
+                if (appCard) {
+                    e.preventDefault();
+                    const appId = appCard.dataset.appId;
+                    console.log('Grid app dblclick:', appId);
+                    openApp(appId);
+                    return;
+                }
+
+                // 바로가기 카드 더블클릭
+                const shortcutCard = e.target.closest('.app-card[data-url]');
+                if (shortcutCard) {
+                    e.preventDefault();
+                    const url = decodeURIComponent(shortcutCard.dataset.url);
+                    console.log('Grid shortcut dblclick:', url);
+                    safeOpenUrl(url);
+                    return;
+                }
+
+                // 폴더 내 앱 더블클릭
+                const folderAppItem = e.target.closest('.folder-item[data-app-id]');
+                if (folderAppItem) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const appId = folderAppItem.dataset.appId;
+                    console.log('Folder app dblclick:', appId);
+                    openApp(appId);
+                    return;
+                }
+
+                // 폴더 내 바로가기 더블클릭
+                const folderUrlItem = e.target.closest('.folder-item[data-url]');
+                if (folderUrlItem) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const url = decodeURIComponent(folderUrlItem.dataset.url);
+                    console.log('Folder shortcut dblclick:', url);
+                    safeOpenUrl(url);
+                    return;
+                }
+            });
+        });
+
+        // 안전한 URL 열기 함수
+        // URL 정규화 함수
+        function normalizeUrl(url) {
+            if (!url) return '';
+            url = url.trim();
+            // 이미 프로토콜이 있으면 그대로
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+                return url;
+            }
+            // 상대 경로면 그대로 (내부 페이지)
+            if (url.startsWith('/') || url.startsWith('./') || url.endsWith('.html')) {
+                return url;
+            }
+            // 그 외에는 https:// 추가
+            return 'https://' + url;
+        }
+
+        function safeOpenUrl(url) {
+            console.log('safeOpenUrl input:', url);
+            if (!url) {
+                showToast('URL이 없습니다', 'error');
+                return;
+            }
+
+            // URL 정규화
+            const normalizedUrl = normalizeUrl(url);
+            console.log('safeOpenUrl normalized:', normalizedUrl);
+
+            try {
+                const newWindow = window.open(normalizedUrl, '_blank', 'noopener,noreferrer');
+                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                    // 팝업 차단 시 링크 클릭 방식으로 대체
+                    const link = document.createElement('a');
+                    link.href = normalizedUrl;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            } catch (err) {
+                console.error('URL open error:', err);
+                showToast('URL 열기 실패: ' + err.message, 'error');
+            }
+        }
+        window.safeOpenUrl = safeOpenUrl;
+
+        // 전역 함수들 (window에 등록)
+        window.openApp = function (appId) {
+            console.log('openApp called:', appId);
+            const app = apps.find(a => a.id === appId);
+            if (!app) {
+                showToast('앱을 찾을 수 없습니다', 'error');
+                return;
+            }
+            if (app.url) {
+                console.log('Opening app URL:', app.url);
+                safeOpenUrl(app.url);
+            } else if (app.n8nId) {
+                const n8nUrl = `${N8N_API.replace('/api/v1', '')}/workflow/${app.n8nId}`;
+                console.log('Opening n8n URL:', n8nUrl);
+                safeOpenUrl(n8nUrl);
+            } else {
+                showToast('연결된 기능이 없습니다. 앱을 편집하여 URL을 설정하세요.', 'info');
+            }
+        };
+
+        // openShortcutUrl은 safeOpenUrl로 대체됨
+        window.openShortcutUrl = safeOpenUrl;
+
+        window.runWorkflow = function (wfId) {
+            const wf = workflows.find(w => w.id === wfId);
+            if (!wf) return;
+            showToast(`"${wf.name}" 실행 준비 중...`, 'info');
+            // TODO: n8n API 호출
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            initGrid();
+            renderAppList();
+            renderWorkflowList();
+            renderShortcutList();
+            loadLayout();
+            setupResize();
+            setupDragIn();
+            setupFolderDropZones();
+            setupColorPickers();
+            setupIconPickers();
+            loadStats();
+            loadRecentScripts();
+        });
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY + '-data');
+            if (saved) {
+                try {
+                    const d = JSON.parse(saved);
+                    categories = d.categories || [...DEFAULT_CATEGORIES];
+                    apps = d.apps || [...DEFAULT_APPS];
+                    workflows = d.workflows || [];
+                    openCategories = d.openCategories || {};
+                } catch (e) {
+                    categories = [...DEFAULT_CATEGORIES];
+                    apps = [...DEFAULT_APPS];
+                }
+            } else {
+                categories = [...DEFAULT_CATEGORIES];
+                apps = [...DEFAULT_APPS];
+            }
+
+            // 바로가기는 별도 키로 로컬 저장 (사용자별 유지)
+            const savedShortcuts = localStorage.getItem(STORAGE_KEY + '-shortcuts');
+            if (savedShortcuts) {
+                try { shortcuts = JSON.parse(savedShortcuts) || []; } catch (e) { shortcuts = []; }
+            }
+
+            // 폴더 데이터 불러오기
+            const savedFolders = localStorage.getItem(STORAGE_KEY + '-folders');
+            if (savedFolders) {
+                try { folders = JSON.parse(savedFolders) || []; } catch (e) { folders = []; }
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY + '-data', JSON.stringify({ categories, apps, workflows, openCategories }));
+            localStorage.setItem(STORAGE_KEY + '-shortcuts', JSON.stringify(shortcuts)); // 바로가기 별도 저장
+            localStorage.setItem(STORAGE_KEY + '-folders', JSON.stringify(folders));
+        }
+
+        function setupResize() {
+            const handle = document.getElementById('resizeHandle');
+            const sidebar = document.getElementById('sidebar');
+            let isResizing = false;
+
+            handle.addEventListener('mousedown', () => {
+                isResizing = true;
+                handle.classList.add('active');
+                document.body.style.cursor = 'ew-resize';
+                document.body.style.userSelect = 'none';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = e.clientX;
+                if (newWidth >= 200 && newWidth <= 500) sidebar.style.width = newWidth + 'px';
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    handle.classList.remove('active');
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                }
+            });
+        }
+
+        function initGrid() {
+            grid = GridStack.init({
+                column: 12,
+                cellHeight: 60,
+                margin: 8,
+                float: true,
+                animate: true,
+                draggable: { handle: '.widget-header' },
+                resizable: { handles: 'e,se,s,sw,w' },
+                acceptWidgets: true
+            }, '#mainGrid');
+
+            grid.on('added', (e, items) => {
+                items.forEach(item => {
+                    if (item.el) initWidgetContent(item.el, item);
+                });
+                saveLayout();
+            });
+            grid.on('removed', () => { saveLayout(); });
+            grid.on('change', () => saveLayout());
+        }
+
+        function setupDragIn() {
+            GridStack.setupDragIn('.app-item[draggable="true"]', {
+                appendTo: 'body',
+                helper: (e) => {
+                    const el = e.target.closest('.app-item');
+                    const clone = el.cloneNode(true);
+                    clone.style.width = '160px';
+                    clone.style.background = 'var(--bg-card)';
+                    clone.style.borderRadius = '6px';
+                    clone.style.opacity = '0.9';
+                    return clone;
+                }
+            });
+        }
+
+        // 폴더 드랍존 설정 - 앱을 드래그해서 폴더에 추가
+        function setupFolderDropZones() {
+            const gridContainer = document.getElementById('mainGrid');
+
+            // 드래그 시작 시 앱 ID 저장
+            document.addEventListener('dragstart', function (e) {
+                const appItem = e.target.closest('.app-item[data-app-id]');
+                if (appItem) {
+                    e.dataTransfer.setData('text/plain', appItem.dataset.appId);
+                    e.dataTransfer.setData('type', 'app');
+                }
+                const shortcutItem = e.target.closest('.shortcut-chip[data-shortcut-id]');
+                if (shortcutItem) {
+                    e.dataTransfer.setData('text/plain', shortcutItem.dataset.shortcutId);
+                    e.dataTransfer.setData('type', 'shortcut');
+                }
+            });
+
+            // 그리드 컨테이너에 드랍 이벤트 위임
+            gridContainer.addEventListener('dragover', function (e) {
+                const folderItems = e.target.closest('.folder-items');
+                if (folderItems) {
+                    e.preventDefault();
+                    folderItems.style.background = 'rgba(139, 92, 246, 0.2)';
+                }
+            });
+
+            gridContainer.addEventListener('dragleave', function (e) {
+                const folderItems = e.target.closest('.folder-items');
+                if (folderItems) {
+                    folderItems.style.background = '';
+                }
+            });
+
+            gridContainer.addEventListener('drop', function (e) {
+                const folderItems = e.target.closest('.folder-items');
+                if (!folderItems) return;
+
+                e.preventDefault();
+                folderItems.style.background = '';
+
+                const folderWidget = folderItems.closest('.folder-widget');
+                if (!folderWidget) return;
+
+                const folderId = folderWidget.dataset.folderId;
+                const folder = folders.find(f => f.id === folderId);
+                if (!folder) return;
+
+                const itemId = e.dataTransfer.getData('text/plain');
+                const itemType = e.dataTransfer.getData('type') || 'app';
+
+                if (!itemId) return;
+
+                // 이미 폴더에 있는지 확인
+                const alreadyExists = folder.items.some(item =>
+                    item.id === itemId && item.type === itemType
+                );
+
+                if (alreadyExists) {
+                    showToast('이미 폴더에 있습니다', 'info');
+                    return;
+                }
+
+                // 폴더에 항목 추가
+                if (itemType === 'shortcut') {
+                    const shortcut = shortcuts.find(s => s.id === itemId);
+                    if (shortcut) {
+                        folder.items.push({ type: 'shortcut', id: itemId, data: { ...shortcut } });
+                    }
+                } else {
+                    const app = apps.find(a => a.id === itemId);
+                    if (app) {
+                        folder.items.push({ type: 'app', id: itemId });
+                    }
+                }
+
+                // 저장 및 UI 업데이트
+                saveData();
+                updateFolderWidget(folderId);
+                saveLayout();
+                showToast('폴더에 추가됨', 'success');
+            });
+        }
+
+        function loadLayout() {
+            const saved = localStorage.getItem(STORAGE_KEY + '-layout');
+            let items = saved ? JSON.parse(saved) : DEFAULT_LAYOUT;
+
+            grid.removeAll(false);
+            items.forEach(item => {
+                const content = generateWidgetContent(item);
+                if (content) {
+                    const w = grid.addWidget({
+                        x: item.x, y: item.y, w: item.w, h: item.h,
+                        id: item.id || `w-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                        content
+                    });
+                    if (w && w.gridstackNode) {
+                        w.gridstackNode.appId = item.appId;
+                        w.gridstackNode.shortcut = item.shortcut;
+                        w.gridstackNode.workflow = item.workflow;
+                    }
+                }
+            });
+            loadStats();
+            loadRecentScripts();
+        }
+
+        function saveLayout() {
+            const items = grid.save(false);
+            const data = items.map(item => {
+                const el = document.querySelector(`[gs-id="${item.id}"]`);
+                const node = el?.gridstackNode || {};
+                return { x: item.x, y: item.y, w: item.w, h: item.h, id: item.id, appId: node.appId, shortcut: node.shortcut, workflow: node.workflow, folderId: node.folderId };
+            });
+            localStorage.setItem(STORAGE_KEY + '-layout', JSON.stringify(data));
+            localStorage.setItem(STORAGE_KEY + '-folders', JSON.stringify(folders));
+        }
+
+        function resetLayout() {
+            if (!confirm('초기화할까요?')) return;
+            localStorage.removeItem(STORAGE_KEY + '-layout');
+            loadLayout();
+            showToast('초기화됨', 'success');
+        }
+
+        function generateWidgetContent(item) {
+            if (item.shortcut) return createShortcutWidget(item.shortcut);
+            if (item.workflow) return createWorkflowWidget(item.workflow);
+            if (item.folderId) {
+                const folder = folders.find(f => f.id === item.folderId);
+                if (folder) return createFolderWidget(folder);
+            }
+            const app = apps.find(a => a.id === item.appId);
+            if (!app) return null;
+            if (app.type === 'stats') return createStatsWidget();
+            if (app.type === 'recent') return createRecentWidget();
+            if (app.type === 'quick') return createQuickWidget();
+            return createAppWidget(app);
+        }
+
+        function initWidgetContent(el, node) {
+            const content = el.querySelector('.grid-stack-item-content');
+            if (!content || content.innerHTML.trim()) return;
+
+            const appItem = el.querySelector('.app-item');
+            if (appItem) {
+                const appId = appItem.dataset.appId;
+                const app = apps.find(a => a.id === appId);
+                if (app) {
+                    content.innerHTML = app.type ?
+                        (app.type === 'stats' ? createStatsWidget() :
+                            app.type === 'recent' ? createRecentWidget() :
+                                app.type === 'quick' ? createQuickWidget() : createAppWidget(app))
+                        : createAppWidget(app);
+                    if (el.gridstackNode) el.gridstackNode.appId = appId;
+                    if (app.type === 'stats') loadStats();
+                    if (app.type === 'recent') loadRecentScripts();
+                }
+            }
+        }
+
+        // 앱 위젯 생성
+        function createAppWidget(app) {
+            const badge = app.n8nId ? `<span class="n8n-badge">n8n</span>` : '';
+            const linkInfo = app.url ? `→ ${app.url.substring(0, 30)}...` : (app.n8nId ? `→ n8n #${app.n8nId}` : '(링크 없음)');
+
+            return `
+                <div class="grid-stack-item-content" style="position:relative;">
+                    <button class="widget-delete-btn" title="삭제"><i class="bi bi-x"></i></button>
+                    <div class="app-card" data-app-id="${app.id}" style="cursor:pointer;">
+                        <div class="app-icon ${app.color}"><i class="bi ${app.icon}"></i></div>
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-desc">${app.desc} ${badge}</div>
+                        <div style="font-size:0.6rem;color:var(--text-muted);margin-top:4px;">${linkInfo}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createShortcutWidget(s) {
+            const icon = s.favicon ? `<img src="${s.favicon}" style="width:24px;height:24px;">` : '<i class="bi bi-link-45deg"></i>';
+            let hostname = '';
+            try { hostname = new URL(s.url).hostname; } catch (e) { hostname = s.url.substring(0, 20); }
+            const encodedUrl = encodeURIComponent(s.url);
+            return `
+                <div class="grid-stack-item-content" style="position:relative;">
+                    <button class="widget-delete-btn" title="삭제"><i class="bi bi-x"></i></button>
+                    <div class="app-card" data-url="${encodedUrl}" style="cursor:pointer;">
+                        <div class="app-icon bg-blue">${icon}</div>
+                        <div class="app-name">${s.name}</div>
+                        <div class="app-desc">${hostname}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createWorkflowWidget(wf) {
+            const steps = wf.appIds.map(id => {
+                const app = apps.find(a => a.id === id);
+                return app ? `<div class="pipeline-step"><div class="pipeline-step-icon ${app.color}"><i class="bi ${app.icon}"></i></div><span class="pipeline-step-name">${app.name}</span></div>` : '';
+            }).join('<i class="bi bi-arrow-right pipeline-arrow"></i>');
+            return `
+                <div class="grid-stack-item-content" style="position:relative;">
+                    <button class="widget-delete-btn" title="삭제"><i class="bi bi-x"></i></button>
+                    <div class="widget-header">
+                        <button class="workflow-run-btn" data-workflow-id="${wf.id}" data-action="run" title="워크플로우 실행"><i class="bi bi-play-fill"></i></button>
+                        <div class="widget-header-icon bg-purple"><i class="bi bi-diagram-3"></i></div>
+                        <div class="widget-header-title">${wf.name}</div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="pipeline-flow">${steps}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createStatsWidget() {
+            return `
+                <div class="grid-stack-item-content" style="position:relative;">
+                    <button class="widget-delete-btn" title="삭제"><i class="bi bi-x"></i></button>
+                    <div class="widget-header">
+                        <div class="widget-header-icon bg-blue"><i class="bi bi-bar-chart"></i></div>
+                        <div class="widget-header-title">통계</div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="stats-grid">
+                            <div class="stat-item"><div class="stat-value" id="totalScripts">-</div><div class="stat-label">전체</div></div>
+                            <div class="stat-item"><div class="stat-value" id="todayScripts">-</div><div class="stat-label">오늘</div></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createRecentWidget() {
+            return `
+                <div class="grid-stack-item-content" style="position:relative;">
+                    <button class="widget-delete-btn" title="삭제"><i class="bi bi-x"></i></button>
+                    <div class="widget-header">
+                        <div class="widget-header-icon bg-orange"><i class="bi bi-clock-history"></i></div>
+                        <div class="widget-header-title">최근 대본</div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="script-list" id="recentScriptList">
+                            <div class="script-item"><div class="script-icon bg-purple"><i class="bi bi-hourglass"></i></div><span class="script-name">로딩...</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createQuickWidget() {
+            return `
+                <div class="grid-stack-item-content" style="position:relative;">
+                    <button class="widget-delete-btn" title="삭제"><i class="bi bi-x"></i></button>
+                    <div class="widget-header">
+                        <div class="widget-header-icon bg-pink"><i class="bi bi-lightning"></i></div>
+                        <div class="widget-header-title">빠른 실행</div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="quick-actions">
+                            <button class="quick-btn" data-url="economy_script.html"><i class="bi bi-graph-up-arrow"></i><span>경제</span></button>
+                            <button class="quick-btn" data-url="${N8N_API.replace('/api/v1', '')}"><i class="bi bi-diagram-3"></i><span>n8n</span></button>
+                            <button class="quick-btn" data-url="rag.html"><i class="bi bi-database"></i><span>RAG</span></button>
+                            <button class="quick-btn" data-url="index.html"><i class="bi bi-house"></i><span>포털</span></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 폴더 위젯 생성
+        function createFolderWidget(folder) {
+            const itemsHtml = folder.items.map(item => {
+                if (item.type === 'app') {
+                    const app = apps.find(a => a.id === item.id);
+                    if (!app) return '';
+                    return `
+                        <div class="folder-item" data-app-id="${app.id}" data-action="open" title="${app.name}">
+                            <div class="folder-item-icon ${app.color}"><i class="bi ${app.icon}"></i></div>
+                            <div class="folder-item-name">${app.name}</div>
+                        </div>
+                    `;
+                } else if (item.type === 'shortcut') {
+                    // item에 직접 저장된 정보 사용 또는 shortcuts에서 검색
+                    let shortcut = item.data || shortcuts.find(s => s.id === item.id);
+                    if (!shortcut) return '';
+                    return `
+                        <div class="folder-item" data-url="${encodeURIComponent(shortcut.url)}" data-action="openUrl" title="${shortcut.name}">
+                            <div class="folder-item-icon bg-blue">${shortcut.favicon ? `<img src="${shortcut.favicon}">` : '<i class="bi bi-link-45deg"></i>'}</div>
+                            <div class="folder-item-name">${shortcut.name}</div>
+                        </div>
+                    `;
+                }
+                return '';
+            }).join('');
+
+            return `
+                <div class="grid-stack-item-content" style="position:relative;">
+                    <button class="widget-delete-btn" title="삭제"><i class="bi bi-x"></i></button>
+                    <div class="folder-widget" data-folder-id="${folder.id}">
+                        <div class="folder-header" data-folder-id="${folder.id}" data-action="editFolder">
+                            <i class="bi bi-folder-fill" style="color: ${folder.color || '#fbbf24'}"></i>
+                            <span class="folder-name">${folder.name}</span>
+                            <span class="folder-count">${folder.items.length}</span>
+                        </div>
+                        <div class="folder-items">
+                            ${itemsHtml}
+                            <div class="folder-add-btn" data-folder-id="${folder.id}" data-action="addToFolder" title="항목 추가">
+                                <i class="bi bi-plus"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 앱 리스트 (풀다운 아코디언)
+        function renderAppList() {
+            const list = document.getElementById('appList');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            list.innerHTML = categories.map(cat => {
+                const catApps = apps.filter(a => a.catId === cat.id && (a.name.toLowerCase().includes(search) || a.desc.toLowerCase().includes(search)));
+                const isOpen = openCategories[cat.id] || search.length > 0;
+
+                return `
+                    <div class="app-category">
+                        <div class="category-header" onclick="toggleCategory('${cat.id}')">
+                            <i class="bi bi-chevron-right category-toggle ${isOpen ? 'open' : ''}"></i>
+                            <div class="category-icon ${cat.color}"><i class="bi ${cat.icon}"></i></div>
+                            <span class="category-name">${cat.name}</span>
+                            <span class="category-count">${catApps.length}</span>
+                            <div class="category-actions">
+                                <button class="category-btn" onclick="event.stopPropagation();openAppModal('${cat.id}')" title="앱 추가"><i class="bi bi-plus"></i></button>
+                                <button class="category-btn" onclick="event.stopPropagation();editCategory('${cat.id}')" title="편집"><i class="bi bi-pencil"></i></button>
+                                <button class="category-btn" onclick="event.stopPropagation();deleteCategory('${cat.id}')" title="삭제"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="app-items ${isOpen ? 'open' : ''}">
+                            ${catApps.map(app => {
+                    const safeId = app.id.replace(/'/g, "\\'");
+                    return `
+                                <div class="app-item" draggable="true" data-app-id="${app.id}" data-action="open">
+                                    <div class="app-item-icon ${app.color}"><i class="bi ${app.icon}"></i></div>
+                                    <div class="app-item-info">
+                                        <div class="app-item-name">${app.name}${app.n8nId ? ' <span class="n8n-badge">n8n</span>' : ''}</div>
+                                        <div class="app-item-desc">${app.desc}</div>
+                                    </div>
+                                    <button class="add-btn" data-app-id="${app.id}" data-action="add" title="그리드에 추가"><i class="bi bi-plus"></i></button>
+                                    <div class="app-item-actions">
+                                        <button class="category-btn" data-app-id="${app.id}" data-action="edit" title="편집"><i class="bi bi-pencil"></i></button>
+                                        <button class="category-btn" data-app-id="${app.id}" data-action="delete" title="삭제"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </div>
+                            `}).join('')}
+                            ${catApps.length === 0 ? '<div style="padding:8px;color:var(--text-muted);font-size:0.75rem;">앱 없음</div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            setupDragIn();
+        }
+
+        window.toggleCategory = function (catId) {
+            openCategories[catId] = !openCategories[catId];
+            saveData();
+            renderAppList();
+        };
+
+        function filterApps() { renderAppList(); }
+
+        function renderWorkflowList() {
+            const list = document.getElementById('workflowList');
+            if (!workflows.length) {
+                list.innerHTML = '<div style="color:var(--text-muted);font-size:0.75rem;padding:4px;">워크플로우 없음</div>';
+                return;
+            }
+            list.innerHTML = workflows.map(wf => {
+                const steps = wf.appIds.map(id => {
+                    const app = apps.find(a => a.id === id);
+                    return app ? `<div style="width:12px;height:12px;border-radius:3px;" class="${app.color}"></div>` : '';
+                }).join('');
+                return `
+                <div class="workflow-item">
+                    <div class="workflow-item-main" onclick="addWorkflowToGrid('${wf.id}')">
+                        <i class="bi bi-diagram-3 workflow-item-icon"></i>
+                        <span class="workflow-item-name">${wf.name}</span>
+                        <div class="workflow-item-steps">${steps}</div>
+                    </div>
+                    <div class="workflow-item-actions">
+                        <button class="wf-action-btn" onclick="event.stopPropagation();editWorkflow('${wf.id}')" title="편집"><i class="bi bi-pencil"></i></button>
+                        <button class="wf-action-btn wf-delete-btn" onclick="event.stopPropagation();deleteWorkflow('${wf.id}')" title="삭제"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.addWorkflowToGrid = function (wfId) {
+            const wf = workflows.find(w => w.id === wfId);
+            if (!wf) return;
+            const w = grid.addWidget({ w: 6, h: 2, id: `wf-${Date.now()}`, content: createWorkflowWidget(wf) });
+            if (w?.gridstackNode) w.gridstackNode.workflow = wf;
+            saveLayout();
+            showToast('워크플로우 추가됨', 'success');
+        };
+
+        function renderShortcutList() {
+            const list = document.getElementById('shortcutList');
+            list.innerHTML = shortcuts.map(s => {
+                return `
+                <div class="shortcut-item">
+                    <div class="shortcut-chip" draggable="true" data-shortcut-id="${s.id}" data-url="${encodeURIComponent(s.url)}" data-action="open">
+                        ${s.favicon ? `<img src="${s.favicon}">` : '<i class="bi bi-link-45deg"></i>'}
+                        <span>${s.name}</span>
+                    </div>
+                    <button class="shortcut-add-btn" data-shortcut-id="${s.id}" data-action="add" title="그리드에 추가"><i class="bi bi-plus"></i></button>
+                </div>`;
+            }).join('');
+        }
+
+        window.addShortcutToGrid = function (sId) {
+            const s = shortcuts.find(x => x.id === sId);
+            if (!s) return;
+            const w = grid.addWidget({ w: 2, h: 2, id: `sc-${Date.now()}`, content: createShortcutWidget(s) });
+            if (w?.gridstackNode) w.gridstackNode.shortcut = s;
+            saveLayout();
+            showToast('바로가기 추가됨', 'success');
+        };
+
+        // 모달 함수들
+        window.openAppModal = function (catId = null) {
+            editingAppId = null;
+            document.getElementById('appModalTitle').textContent = '앱 추가';
+            const select = document.getElementById('appCategory');
+            select.innerHTML = categories.map(c => `<option value="${c.id}" ${c.id === catId ? 'selected' : ''}>${c.name}</option>`).join('');
+            document.getElementById('appName').value = '';
+            document.getElementById('appDesc').value = '';
+            document.getElementById('appUrl').value = '';
+            document.getElementById('appN8nId').value = '';
+            selectedColor = 'bg-purple';
+            selectedIcon = 'bi-stars';
+            updateColorSelection('colorPicker', selectedColor);
+            updateIconSelection('iconPicker', selectedIcon);
+            document.getElementById('appModal').classList.add('active');
+        };
+
+        window.editApp = function (appId) {
+            const app = apps.find(a => a.id === appId);
+            if (!app) return;
+            editingAppId = appId;
+            document.getElementById('appModalTitle').textContent = '앱 편집';
+            const select = document.getElementById('appCategory');
+            select.innerHTML = categories.map(c => `<option value="${c.id}" ${c.id === app.catId ? 'selected' : ''}>${c.name}</option>`).join('');
+            document.getElementById('appName').value = app.name;
+            document.getElementById('appDesc').value = app.desc;
+            document.getElementById('appUrl').value = app.url || '';
+            document.getElementById('appN8nId').value = app.n8nId || '';
+            selectedColor = app.color;
+            selectedIcon = app.icon;
+            updateColorSelection('colorPicker', selectedColor);
+            updateIconSelection('iconPicker', selectedIcon);
+            document.getElementById('appModal').classList.add('active');
+        };
+
+        window.closeAppModal = function () { document.getElementById('appModal').classList.remove('active'); };
+
+        window.saveApp = function () {
+            const catId = document.getElementById('appCategory').value;
+            const name = document.getElementById('appName').value.trim();
+            const desc = document.getElementById('appDesc').value.trim() || '설명 없음';
+            const url = document.getElementById('appUrl').value.trim();
+            const n8nId = document.getElementById('appN8nId').value.trim();
+            if (!name) { showToast('이름 입력', 'error'); return; }
+
+            if (editingAppId) {
+                const app = apps.find(a => a.id === editingAppId);
+                if (app) Object.assign(app, { catId, name, desc, url, n8nId, color: selectedColor, icon: selectedIcon });
+                showToast('수정됨', 'success');
+            } else {
+                apps.push({ id: `app-${Date.now()}`, catId, name, desc, icon: selectedIcon, color: selectedColor, url, n8nId });
+                showToast('추가됨', 'success');
+            }
+            saveData();
+            renderAppList();
+            closeAppModal();
+        };
+
+        window.deleteApp = function (appId) {
+            if (!confirm('삭제할까요?')) return;
+            apps = apps.filter(a => a.id !== appId);
+            saveData();
+            renderAppList();
+            showToast('삭제됨', 'info');
+        };
+
+        window.openCategoryModal = function () {
+            document.getElementById('catName').value = '';
+            catSelectedColor = 'bg-purple';
+            catSelectedIcon = 'bi-folder';
+            updateColorSelection('catColorPicker', catSelectedColor);
+            updateIconSelection('catIconPicker', catSelectedIcon);
+            document.getElementById('categoryModal').classList.add('active');
+        };
+
+        window.closeCategoryModal = function () { document.getElementById('categoryModal').classList.remove('active'); };
+
+        window.saveCategory = function () {
+            const name = document.getElementById('catName').value.trim();
+            if (!name) { showToast('이름 입력', 'error'); return; }
+            categories.push({ id: `cat-${Date.now()}`, name, icon: catSelectedIcon, color: catSelectedColor });
+            saveData();
+            renderAppList();
+            closeCategoryModal();
+            showToast('카테고리 추가됨', 'success');
+        };
+
+        window.editCategory = function (catId) {
+            const cat = categories.find(c => c.id === catId);
+            if (!cat) return;
+            const newName = prompt('카테고리 이름', cat.name);
+            if (newName && newName.trim()) {
+                cat.name = newName.trim();
+                saveData();
+                renderAppList();
+            }
+        };
+
+        window.deleteCategory = function (catId) {
+            if (!confirm('카테고리와 앱을 삭제할까요?')) return;
+            categories = categories.filter(c => c.id !== catId);
+            apps = apps.filter(a => a.catId !== catId);
+            saveData();
+            renderAppList();
+            showToast('삭제됨', 'info');
+        };
+
+        window.openShortcutModal = function () {
+            document.getElementById('shortcutUrl').value = '';
+            document.getElementById('shortcutName').value = '';
+            document.getElementById('shortcutModal').classList.add('active');
+        };
+
+        window.closeShortcutModal = function () { document.getElementById('shortcutModal').classList.remove('active'); };
+
+        window.fetchShortcutInfo = function () {
+            const url = document.getElementById('shortcutUrl').value;
+            if (!url) return;
+            try {
+                const domain = new URL(url).hostname;
+                const n = document.getElementById('shortcutName');
+                if (!n.value) n.value = domain.replace('www.', '').split('.')[0];
+            } catch (e) { }
+        };
+
+        window.addShortcut = function () {
+            const url = document.getElementById('shortcutUrl').value.trim();
+            const name = document.getElementById('shortcutName').value.trim();
+            if (!url || !name) { showToast('URL과 이름 입력', 'error'); return; }
+            let favicon = null;
+            try { favicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`; } catch (e) { }
+            const s = { id: `s-${Date.now()}`, url, name, favicon };
+            shortcuts.push(s);
+            saveData();
+            renderShortcutList();
+            addShortcutToGrid(s.id);
+            closeShortcutModal();
+        };
+
+        window.openWorkflowModal = function () {
+            editingWorkflowId = null;
+            document.getElementById('wfName').value = '';
+            wfSelectedApps = [];
+            renderWfAppSelector();
+            renderWfPipeline();
+            document.querySelector('#workflowModal .modal-title').textContent = '워크플로우 만들기';
+            document.getElementById('workflowModal').classList.add('active');
+        };
+
+        window.closeWorkflowModal = function () {
+            editingWorkflowId = null;
+            document.getElementById('workflowModal').classList.remove('active');
+        };
+
+        // === 폴더 기능 ===
+        window.openFolderModal = function () {
+            document.getElementById('folderModal').classList.add('active');
+            document.getElementById('folderName').value = '';
+            document.getElementById('folderColor').value = '#fbbf24';
+            folderSelectedItems = [];
+            renderFolderItemSelector();
+        };
+
+        window.closeFolderModal = function () { document.getElementById('folderModal').classList.remove('active'); };
+
+        let folderSelectedItems = [];
+        let editingFolderId = null;
+
+        function renderFolderItemSelector() {
+            const el = document.getElementById('folderItemSelector');
+            const appItems = apps.filter(a => !a.type).map(app => `
+                <div class="folder-select-item" data-type="app" data-id="${app.id}" onclick="toggleFolderItem('app', '${app.id}')">
+                    <input type="checkbox" ${folderSelectedItems.some(i => i.type === 'app' && i.id === app.id) ? 'checked' : ''} style="pointer-events:none;">
+                    <div class="app-item-icon ${app.color}" style="width:24px;height:24px;font-size:0.8rem;"><i class="bi ${app.icon}"></i></div>
+                    <span>${app.name}</span>
+                </div>
+            `).join('');
+
+            const shortcutItems = shortcuts.map(s => `
+                <div class="folder-select-item" data-type="shortcut" data-id="${s.id}" onclick="toggleFolderItem('shortcut', '${s.id}')">
+                    <input type="checkbox" ${folderSelectedItems.some(i => i.type === 'shortcut' && i.id === s.id) ? 'checked' : ''} style="pointer-events:none;">
+                    <div class="app-item-icon bg-blue" style="width:24px;height:24px;font-size:0.8rem;">${s.favicon ? `<img src="${s.favicon}" style="width:16px;height:16px;">` : '<i class="bi bi-link-45deg"></i>'}</div>
+                    <span>${s.name}</span>
+                </div>
+            `).join('');
+
+            el.innerHTML = `
+                <div style="margin-bottom:8px;font-size:0.75rem;color:var(--text-muted);">앱</div>
+                ${appItems}
+                <div style="margin:12px 0 8px;font-size:0.75rem;color:var(--text-muted);">바로가기</div>
+                ${shortcutItems}
+            `;
+        }
+
+        window.toggleFolderItem = function (type, id) {
+            const idx = folderSelectedItems.findIndex(i => i.type === type && i.id === id);
+            if (idx >= 0) {
+                folderSelectedItems.splice(idx, 1);
+            } else {
+                folderSelectedItems.push({ type, id });
+            }
+            renderFolderItemSelector();
+        };
+
+        window.saveFolder = function () {
+            const name = document.getElementById('folderName').value.trim();
+            const color = document.getElementById('folderColor').value;
+
+            if (!name) { showToast('폴더 이름을 입력하세요', 'error'); return; }
+            if (folderSelectedItems.length === 0) { showToast('항목을 선택하세요', 'error'); return; }
+
+            // 바로가기는 데이터를 직접 포함 (ID 참조 문제 방지)
+            const itemsWithData = folderSelectedItems.map(item => {
+                if (item.type === 'shortcut') {
+                    const shortcut = item.data || shortcuts.find(s => s.id === item.id);
+                    if (shortcut) {
+                        return { type: 'shortcut', id: item.id, data: { ...shortcut } };
+                    }
+                }
+                return item;
+            });
+
+            const folder = {
+                id: editingFolderId || `folder-${Date.now()}`,
+                name,
+                color,
+                items: itemsWithData
+            };
+
+            if (editingFolderId) {
+                const idx = folders.findIndex(f => f.id === editingFolderId);
+                if (idx >= 0) folders[idx] = folder;
+                // 기존 폴더 위젯 업데이트
+                updateFolderWidget(folder.id);
+            } else {
+                folders.push(folder);
+                // 새 폴더를 그리드에 추가
+                const w = grid.addWidget({ w: 3, h: 3, id: `folder-${Date.now()}`, content: createFolderWidget(folder) });
+                if (w?.gridstackNode) w.gridstackNode.folderId = folder.id;
+            }
+
+            // 데이터 저장
+            saveData();
+            saveLayout();
+            closeFolderModal();
+            showToast(editingFolderId ? '폴더가 수정되었습니다' : '폴더가 생성되었습니다', 'success');
+            editingFolderId = null;
+        };
+
+        window.editFolder = function (folderId) {
+            const folder = folders.find(f => f.id === folderId);
+            if (!folder) return;
+
+            editingFolderId = folderId;
+            document.getElementById('folderModal').classList.add('active');
+            document.getElementById('folderName').value = folder.name;
+            document.getElementById('folderColor').value = folder.color || '#fbbf24';
+            folderSelectedItems = [...folder.items];
+            renderFolderItemSelector();
+        };
+
+        window.openAddToFolderModal = function (folderId) {
+            const folder = folders.find(f => f.id === folderId);
+            if (!folder) return;
+
+            editingFolderId = folderId;
+            document.getElementById('folderModal').classList.add('active');
+            document.getElementById('folderName').value = folder.name;
+            document.getElementById('folderColor').value = folder.color || '#fbbf24';
+            // 기존 항목을 정확히 복사 (data 포함)
+            folderSelectedItems = folder.items.map(item => ({ ...item }));
+            renderFolderItemSelector();
+        };
+
+        // 폴더 위젯 업데이트 함수
+        function updateFolderWidget(folderId) {
+            const folder = folders.find(f => f.id === folderId);
+            if (!folder) return;
+
+            // 해당 폴더 위젯 찾기
+            const folderWidget = document.querySelector(`.folder-widget[data-folder-id="${folderId}"]`);
+            if (folderWidget) {
+                const gridItem = folderWidget.closest('.grid-stack-item');
+                if (gridItem) {
+                    const content = gridItem.querySelector('.grid-stack-item-content');
+                    if (content) {
+                        content.innerHTML = createFolderWidget(folder);
+                    }
+                }
+            }
+        }
+        window.updateFolderWidget = updateFolderWidget;
+
+        // 폴더 생성 버튼을 사이드바에 추가하는 함수
+
+        function renderWfAppSelector() {
+            const el = document.getElementById('wfAppSelector');
+            el.innerHTML = apps.filter(a => !a.type).map(app => `
+                <div style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg-dark);border-radius:4px;cursor:pointer;" onclick="toggleWfApp('${app.id}')">
+                    <input type="checkbox" ${wfSelectedApps.includes(app.id) ? 'checked' : ''} style="pointer-events:none;">
+                    <div class="app-item-icon ${app.color}" style="width:20px;height:20px;font-size:0.7rem;"><i class="bi ${app.icon}"></i></div>
+                    <span style="font-size:0.8rem;">${app.name}</span>
+                </div>
+            `).join('');
+        }
+
+        window.toggleWfApp = function (appId) {
+            if (wfSelectedApps.includes(appId)) {
+                wfSelectedApps = wfSelectedApps.filter(id => id !== appId);
+            } else {
+                wfSelectedApps.push(appId);
+            }
+            renderWfAppSelector();
+            renderWfPipeline();
+        };
+
+        function renderWfPipeline() {
+            const el = document.getElementById('wfPipeline');
+            if (!wfSelectedApps.length) {
+                el.innerHTML = '<span style="color:var(--text-muted);font-size:0.75rem;">앱을 선택하세요</span>';
+                return;
+            }
+            el.innerHTML = wfSelectedApps.map((id, i) => {
+                const app = apps.find(a => a.id === id);
+                if (!app) return '';
+                const arrow = i < wfSelectedApps.length - 1 ? '<i class="bi bi-arrow-right" style="color:var(--text-muted);"></i>' : '';
+                return `<div style="display:flex;align-items:center;gap:4px;padding:4px 8px;background:var(--bg-card);border-radius:4px;"><div class="${app.color}" style="width:16px;height:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;"><i class="bi ${app.icon}"></i></div><span style="font-size:0.75rem;">${app.name}</span></div>${arrow}`;
+            }).join('');
+        }
+
+        window.saveWorkflow = function () {
+            const name = document.getElementById('wfName').value.trim();
+            if (!name) { showToast('이름 입력', 'error'); return; }
+            if (wfSelectedApps.length < 2) { showToast('2개 이상 선택', 'error'); return; }
+
+            if (editingWorkflowId) {
+                // 편집 모드
+                const idx = workflows.findIndex(w => w.id === editingWorkflowId);
+                if (idx >= 0) {
+                    workflows[idx] = { id: editingWorkflowId, name, appIds: [...wfSelectedApps] };
+                    showToast('워크플로우 수정됨', 'success');
+                }
+                editingWorkflowId = null;
+            } else {
+                // 새로 생성
+                const wf = { id: `wf-${Date.now()}`, name, appIds: [...wfSelectedApps] };
+                workflows.push(wf);
+                showToast('워크플로우 생성됨', 'success');
+            }
+            saveData();
+            renderWorkflowList();
+            closeWorkflowModal();
+        };
+
+        window.editWorkflow = function (wfId) {
+            const wf = workflows.find(w => w.id === wfId);
+            if (!wf) return;
+
+            editingWorkflowId = wfId;
+            document.getElementById('wfName').value = wf.name;
+            wfSelectedApps = [...wf.appIds];
+            renderWfAppSelector();
+            renderWfPipeline();
+
+            // 모달 제목 변경
+            document.querySelector('#workflowModal .modal-title').textContent = '워크플로우 편집';
+            document.getElementById('workflowModal').classList.add('active');
+        };
+
+        window.deleteWorkflow = function (wfId) {
+            const wf = workflows.find(w => w.id === wfId);
+            if (!wf) return;
+
+            if (!confirm(`"${wf.name}" 워크플로우를 삭제할까요?`)) return;
+
+            workflows = workflows.filter(w => w.id !== wfId);
+            saveData();
+            renderWorkflowList();
+            showToast('워크플로우 삭제됨', 'success');
+        };
+
+        // 편집 모드
+        window.toggleEditMode = function () {
+            editMode = !editMode;
+            grid.enableMove(editMode);
+            grid.enableResize(editMode);
+            document.getElementById('editModeText').textContent = editMode ? '완료' : '편집';
+            showToast(editMode ? '편집 모드 - 드래그/리사이즈 가능' : '편집 종료', 'info');
+        };
+
+        function setupColorPickers() {
+            ['colorPicker', 'catColorPicker'].forEach(id => {
+                const el = document.getElementById(id);
+                el.innerHTML = COLORS.map(c => `<div class="color-option ${c}" data-color="${c}"></div>`).join('');
+                el.querySelectorAll('.color-option').forEach(opt => {
+                    opt.onclick = () => {
+                        if (id === 'colorPicker') selectedColor = opt.dataset.color;
+                        else catSelectedColor = opt.dataset.color;
+                        updateColorSelection(id, opt.dataset.color);
+                    };
+                });
+            });
+        }
+
+        function updateColorSelection(pickerId, color) {
+            document.querySelectorAll(`#${pickerId} .color-option`).forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.color === color);
+            });
+        }
+
+        function setupIconPickers() {
+            ['iconPicker', 'catIconPicker'].forEach(id => {
+                const el = document.getElementById(id);
+                el.innerHTML = ICONS.map(i => `<div class="icon-option" data-icon="${i}"><i class="bi ${i}"></i></div>`).join('');
+                el.querySelectorAll('.icon-option').forEach(opt => {
+                    opt.onclick = () => {
+                        if (id === 'iconPicker') selectedIcon = opt.dataset.icon;
+                        else catSelectedIcon = opt.dataset.icon;
+                        updateIconSelection(id, opt.dataset.icon);
+                    };
+                });
+            });
+        }
+
+        function updateIconSelection(pickerId, icon) {
+            document.querySelectorAll(`#${pickerId} .icon-option`).forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.icon === icon);
+            });
+        }
+
+        // API
+        async function loadStats() {
+            try {
+                const res = await fetch(`${RAG_API}/scripts`);
+                if (res.ok) {
+                    const scripts = await res.json();
+                    const el1 = document.getElementById('totalScripts');
+                    const el2 = document.getElementById('todayScripts');
+                    if (el1) el1.textContent = scripts.length || 0;
+                    const today = new Date().toISOString().split('T')[0];
+                    if (el2) el2.textContent = scripts.filter(s => s.created_at?.startsWith(today)).length;
+                }
+            } catch (e) { console.log('Stats error:', e); }
+        }
+
+        async function loadRecentScripts() {
+            try {
+                const res = await fetch(`${RAG_API}/scripts?limit=5`);
+                if (res.ok) {
+                    const scripts = await res.json();
+                    const el = document.getElementById('recentScriptList');
+                    if (!el) return;
+                    if (!scripts.length) {
+                        el.innerHTML = '<div class="script-item"><div class="script-icon bg-purple"><i class="bi bi-inbox"></i></div><span class="script-name">대본 없음</span></div>';
+                        return;
+                    }
+                    el.innerHTML = scripts.slice(0, 5).map(s => {
+                        const title = s.metadata?.topic || s.metadata?.title || '제목 없음';
+                        const date = s.created_at ? new Date(s.created_at).toLocaleDateString('ko-KR') : '-';
+                        return `<div class="script-item" onclick="location.href='rag.html?id=${s.id}'"><div class="script-icon bg-orange"><i class="bi bi-file-text"></i></div><span class="script-name">${title}</span><span class="script-date">${date}</span></div>`;
+                    }).join('');
+                }
+            } catch (e) { console.log('Recent error:', e); }
+        }
+
+        function showToast(msg, type = 'info') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i><span>${msg}</span>`;
+            c.appendChild(t);
+            setTimeout(() => { t.style.animation = 'slideIn 0.3s ease reverse'; setTimeout(() => t.remove(), 300); }, 2500);
+        }
+    </script>
+<!-- 도움말 오버레이 -->
+<div class="help-overlay" id="helpOverlay" onclick="toggleHelpPanel()"></div>
+<div class="help-panel" id="helpPanel">
+    <div class="help-panel-header">
+        <h3><i class="bi bi-question-circle"></i> 도움말</h3>
+        <button class="help-panel-close" onclick="toggleHelpPanel()"><i class="bi bi-x"></i></button>
+    </div>
+    <div class="help-tabs">
+        <button class="help-tab active" onclick="showHelpTab('basic')">기본 사용법</button>
+        <button class="help-tab" onclick="showHelpTab('deploy')">배포 가이드</button>
+        <button class="help-tab" onclick="showHelpTab('links')">바로가기</button>
+    </div>
+    <div class="help-panel-content">
+        <div class="help-tab-content active" id="helpTab-basic">
+            <div class="help-section"><h4><i class="bi bi-hand-index"></i> 앱 실행</h4>
+                <div class="help-step"><div class="help-step-num">1</div><div class="help-step-content"><strong>더블클릭</strong><span>사이드바 앱 아이콘 더블클릭</span></div></div>
+                <div class="help-step"><div class="help-step-num">2</div><div class="help-step-content"><strong>드래그</strong><span>편집 모드에서 그리드 배치</span></div></div>
+            </div>
+            <div class="help-section"><h4><i class="bi bi-pencil"></i> 편집 모드</h4>
+                <p>상단 편집 버튼 클릭 시 활성화</p>
+                <div class="help-step"><div class="help-step-num">↔</div><div class="help-step-content"><strong>이동</strong><span>드래그하여 위치 변경</span></div></div>
+                <div class="help-step"><div class="help-step-num">⤢</div><div class="help-step-content"><strong>크기</strong><span>모서리 드래그</span></div></div>
+            </div>
+            <div class="help-section"><h4><i class="bi bi-keyboard"></i> 단축키</h4>
+                <table class="help-table"><tr><th>단축키</th><th>기능</th></tr><tr><td><code>Ctrl+S</code></td><td>저장</td></tr><tr><td><code>Ctrl+Shift+R</code></td><td>새로고침</td></tr></table>
+            </div>
+        </div>
+        <div class="help-tab-content" id="helpTab-deploy">
+            <div class="help-section"><h4><i class="bi bi-diagram-3"></i> 배포 프로세스</h4>
+                <div class="help-step"><div class="help-step-num">1</div><div class="help-step-content"><strong>n8n 등록</strong><span>Import → Credentials</span></div></div>
+                <div class="help-step"><div class="help-step-num">2</div><div class="help-step-content"><strong>활성화</strong><span>Save → Active ON</span></div></div>
+                <div class="help-step"><div class="help-step-num">3</div><div class="help-step-content"><strong>업로드</strong><span>SSH/SCP</span></div></div>
+                <div class="help-step"><div class="help-step-num">4</div><div class="help-step-content"><strong>아이콘</strong><span>앱 추가</span></div></div>
+            </div>
+            <div class="help-section"><h4><i class="bi bi-server"></i> 서버</h4>
+                <table class="help-table"><tr><th>항목</th><th>값</th></tr><tr><td>IP</td><td><code>152.42.210.15</code></td></tr><tr><td>경로</td><td><code>/root/realhun-app/frontend/admin/</code></td></tr></table>
+            </div>
+        </div>
+        <div class="help-tab-content" id="helpTab-links">
+            <div class="help-section"><h4><i class="bi bi-link-45deg"></i> 바로가기</h4>
+            <div class="help-links">
+<a href="https://n8n.hyehwa72.org" target="_blank" class="help-link"><i class="bi bi-diagram-3"></i><strong>n8n</strong></a>
+<a href="https://api.hyehwa72.org/docs" target="_blank" class="help-link"><i class="bi bi-database"></i><strong>RAG API</strong></a>
+<a href="index.html" class="help-link"><i class="bi bi-house"></i><strong>포털</strong></a>
+<a href="n8n-deploy-guide.html" target="_blank" class="help-link"><i class="bi bi-book"></i><strong>배포가이드</strong></a>
+<a href="n8n-generator.html" class="help-link"><i class="bi bi-robot"></i><strong>n8n생성기</strong></a>
+</div></div></div>
+    </div></div>
+<div class="settings-modal" id="settingsModal"><div class="settings-content">
+    <div class="settings-header"><h3><i class="bi bi-gear"></i> 설정</h3>
+        <button class="help-panel-close" onclick="toggleSettings()"><i class="bi bi-x"></i></button></div>
+    <div class="settings-body">
+        <div class="settings-group"><h4><i class="bi bi-grid"></i> 레이아웃</h4>
+            <div class="settings-item"><div class="settings-label"><strong>자동 저장</strong></div>
+                <label class="settings-toggle"><input type="checkbox" id="settingAutoSave" checked><span class="slider"></span></label></div></div>
+        <div class="settings-group"><h4><i class="bi bi-hdd"></i> 데이터</h4>
+            <div class="settings-item"><div class="settings-label"><strong>스토리지</strong></div>
+                <button class="btn btn-sm btn-secondary" onclick="showStorageInfo()">확인</button></div>
+            <div class="settings-item"><div class="settings-label"><strong>초기화</strong></div>
+                <button class="btn btn-sm" style="background:#ef4444;color:white" onclick="confirmResetAll()">초기화</button></div></div>
+    </div>
+    <div class="settings-footer">
+        <button class="btn btn-secondary" onclick="toggleSettings()">닫기</button>
+        <button class="btn btn-primary" onclick="saveSettings()"><i class="bi bi-check"></i> 저장</button>
+    </div></div></div>
+</body>
+
+</html>

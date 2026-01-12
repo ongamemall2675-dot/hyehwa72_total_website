@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매물 등록 - 혜화72 부동산</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #1e1e2d;
+            --sidebar-hover: #2d2d3f;
+            --primary: #5c6bc0;
+            --text-muted: #a2a5b9;
+        }
+
+        * {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-brand-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-brand h5 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .sidebar-brand small {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .sidebar-nav {
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--sidebar-hover);
+            color: #fff;
+            border-left: 3px solid var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--sidebar-bg);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: #fff;
+            padding: 15px 25px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            color: #999;
+        }
+
+        .step.active {
+            color: var(--primary);
+        }
+
+        .step.completed {
+            color: #28a745;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .step.active .step-number {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .step.completed .step-number {
+            background: #28a745;
+            color: #fff;
+        }
+
+        .step-line {
+            width: 60px;
+            height: 2px;
+            background: #e9ecef;
+            margin: 0 15px;
+        }
+
+        .step.completed+.step-line {
+            background: #28a745;
+        }
+
+        .upload-zone {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(92, 107, 192, 0.05);
+        }
+
+        .upload-zone i {
+            font-size: 48px;
+            color: #ccc;
+        }
+
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
+            background: #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-item .remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            color: #fff;
+            border: none;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon"><i class="bi bi-building"></i></div>
+            <div>
+                <h5>혜화72</h5><small>부동산 관리시스템</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="bi bi-grid-1x2"></i> 대시보드</a>
+            <a href="ledger.html" class="nav-item"><i class="bi bi-journal-text"></i> 부동산 원장</a>
+            <a href="properties.html" class="nav-item active"><i class="bi bi-building"></i> 매물 관리</a>
+            <a href="customers.html" class="nav-item"><i class="bi bi-people"></i> 고객 관리</a>
+            <a href="requests.html" class="nav-item"><i class="bi bi-clipboard-check"></i> 의뢰 관리</a>
+            <a href="contracts.html" class="nav-item"><i class="bi bi-file-earmark-text"></i> 계약 관리</a>
+            <a href="schedules.html" class="nav-item"><i class="bi bi-calendar3"></i> 일정 관리</a>
+            <a href="settings.html" class="nav-item"><i class="bi bi-gear"></i> 설정</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar"><i class="bi bi-person"></i></div>
+                <div>
+                    <div style="font-weight: 600;">김훈</div><small style="color: var(--text-muted);">대학로혜화72</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <div class="topbar">
+            <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>매물 등록</h5>
+            <a href="properties.html" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>목록으로
+            </a>
+        </div>
+
+        <div class="content">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" data-step="1">
+                    <span class="step-number">1</span>
+                    <span>기본정보</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" data-step="2">
+                    <span class="step-number">2</span>
+                    <span>상세정보</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" data-step="3">
+                    <span class="step-number">3</span>
+                    <span>사진등록</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" data-step="4">
+                    <span class="step-number">4</span>
+                    <span>확인</span>
+                </div>
+            </div>
+
+            <!-- Step 1: 기본정보 -->
+            <div class="card" id="step1">
+                <div class="card-header py-3"><i class="bi bi-info-circle me-2"></i>기본 정보</div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">물건유형 *</label>
+                            <select class="form-select" id="propertyType">
+                                <option value="">선택하세요</option>
+                                <option>아파트</option>
+                                <option>빌라/다세대</option>
+                                <option>오피스텔</option>
+                                <option>단독/다가구</option>
+                                <option>상가</option>
+                                <option>사무실</option>
+                                <option>원룸/투룸</option>
+                                <option>토지</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">거래유형 *</label>
+                            <select class="form-select" id="transactionType">
+                                <option value="">선택하세요</option>
+                                <option>매매</option>
+                                <option>전세</option>
+                                <option>월세</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">주소 *</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="address" placeholder="주소를 검색하세요">
+                                <button class="btn btn-outline-primary" type="button"><i class="bi bi-search"></i>
+                                    검색</button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">상세주소</label>
+                            <input type="text" class="form-control" placeholder="동/호수 등 상세주소">
+                        </div>
+                        <div class="col-md-4" id="salePriceGroup">
+                            <label class="form-label">매매가 (만원)</label>
+                            <input type="number" class="form-control" placeholder="예: 50000">
+                        </div>
+                        <div class="col-md-4" id="depositGroup">
+                            <label class="form-label">보증금 (만원)</label>
+                            <input type="number" class="form-control" placeholder="예: 10000">
+                        </div>
+                        <div class="col-md-4" id="monthlyGroup" style="display:none;">
+                            <label class="form-label">월세 (만원)</label>
+                            <input type="number" class="form-control" placeholder="예: 50">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white d-flex justify-content-end gap-2 py-3">
+                    <button class="btn btn-primary" onclick="nextStep(2)">다음 <i
+                            class="bi bi-arrow-right ms-1"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 2: 상세정보 -->
+            <div class="card d-none" id="step2">
+                <div class="card-header py-3"><i class="bi bi-list-ul me-2"></i>상세 정보</div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <label class="form-label">전용면적 (㎡)</label>
+                            <input type="number" class="form-control" placeholder="84">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">공급면적 (㎡)</label>
+                            <input type="number" class="form-control" placeholder="110">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">해당층</label>
+                            <input type="number" class="form-control" placeholder="5">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">총층</label>
+                            <input type="number" class="form-control" placeholder="15">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">방 수</label>
+                            <select class="form-select">
+                                <option>1개</option>
+                                <option>2개</option>
+                                <option selected>3개</option>
+                                <option>4개</option>
+                                <option>5개 이상</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">욕실 수</label>
+                            <select class="form-select">
+                                <option>1개</option>
+                                <option selected>2개</option>
+                                <option>3개 이상</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">방향</label>
+                            <select class="form-select">
+                                <option>동향</option>
+                                <option>서향</option>
+                                <option selected>남향</option>
+                                <option>북향</option>
+                                <option>남동향</option>
+                                <option>남서향</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">입주가능일</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">난방방식</label>
+                            <select class="form-select">
+                                <option>개별난방</option>
+                                <option>중앙난방</option>
+                                <option>지역난방</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">관리비 (만원)</label>
+                            <input type="number" class="form-control" placeholder="15">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">주차</label>
+                            <select class="form-select">
+                                <option>가능</option>
+                                <option>불가</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">옵션</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="form-check form-check-inline"><input class="form-check-input"
+                                        type="checkbox" id="opt1"><label class="form-check-label" for="opt1">에어컨</label>
+                                </div>
+                                <div class="form-check form-check-inline"><input class="form-check-input"
+                                        type="checkbox" id="opt2"><label class="form-check-label" for="opt2">세탁기</label>
+                                </div>
+                                <div class="form-check form-check-inline"><input class="form-check-input"
+                                        type="checkbox" id="opt3"><label class="form-check-label" for="opt3">냉장고</label>
+                                </div>
+                                <div class="form-check form-check-inline"><input class="form-check-input"
+                                        type="checkbox" id="opt4"><label class="form-check-label"
+                                        for="opt4">가스레인지</label></div>
+                                <div class="form-check form-check-inline"><input class="form-check-input"
+                                        type="checkbox" id="opt5"><label class="form-check-label" for="opt5">인덕션</label>
+                                </div>
+                                <div class="form-check form-check-inline"><input class="form-check-input"
+                                        type="checkbox" id="opt6"><label class="form-check-label"
+                                        for="opt6">전자레인지</label></div>
+                                <div class="form-check form-check-inline"><input class="form-check-input"
+                                        type="checkbox" id="opt7"><label class="form-check-label" for="opt7">TV</label>
+                                </div>
+                                <div class="form-check form-check-inline"><input class="form-check-input"
+                                        type="checkbox" id="opt8"><label class="form-check-label" for="opt8">침대</label>
+                                </div>
+                                <div class="form-check form-check-inline"><input class="form-check-input"
+                                        type="checkbox" id="opt9"><label class="form-check-label" for="opt9">옷장</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">상세설명</label>
+                            <textarea class="form-control" rows="4" placeholder="매물에 대한 상세 설명을 입력하세요"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white d-flex justify-content-between py-3">
+                    <button class="btn btn-outline-secondary" onclick="prevStep(1)"><i
+                            class="bi bi-arrow-left me-1"></i> 이전</button>
+                    <button class="btn btn-primary" onclick="nextStep(3)">다음 <i
+                            class="bi bi-arrow-right ms-1"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 3: 사진등록 -->
+            <div class="card d-none" id="step3">
+                <div class="card-header py-3"><i class="bi bi-camera me-2"></i>사진 등록</div>
+                <div class="card-body">
+                    <div class="upload-zone">
+                        <i class="bi bi-cloud-upload"></i>
+                        <p class="mt-3 mb-1">클릭하거나 파일을 드래그하세요</p>
+                        <small class="text-muted">JPG, PNG, WEBP (최대 10MB, 최대 20장)</small>
+                        <input type="file" class="d-none" multiple accept="image/*">
+                    </div>
+                    <div class="photo-preview">
+                        <div class="photo-item">
+                            <div
+                                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff;">
+                                <i class="bi bi-image" style="font-size:24px;"></i></div>
+                            <button class="remove"><i class="bi bi-x"></i></button>
+                        </div>
+                        <div class="photo-item">
+                            <div
+                                style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff;">
+                                <i class="bi bi-image" style="font-size:24px;"></i></div>
+                            <button class="remove"><i class="bi bi-x"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white d-flex justify-content-between py-3">
+                    <button class="btn btn-outline-secondary" onclick="prevStep(2)"><i
+                            class="bi bi-arrow-left me-1"></i> 이전</button>
+                    <button class="btn btn-primary" onclick="nextStep(4)">다음 <i
+                            class="bi bi-arrow-right ms-1"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 4: 확인 -->
+            <div class="card d-none" id="step4">
+                <div class="card-header py-3"><i class="bi bi-check-circle me-2"></i>등록 정보 확인</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="border-bottom pb-2 mb-3">기본 정보</h6>
+                            <table class="table table-borderless table-sm">
+                                <tr>
+                                    <th width="100" class="text-muted">물건유형</th>
+                                    <td>아파트</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">거래유형</th>
+                                    <td>전세</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">주소</th>
+                                    <td>서울시 종로구 혜화동 123-45</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">보증금</th>
+                                    <td>3억 5,000만원</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="border-bottom pb-2 mb-3">상세 정보</h6>
+                            <table class="table table-borderless table-sm">
+                                <tr>
+                                    <th width="100" class="text-muted">면적</th>
+                                    <td>84㎡ / 110㎡</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">층수</th>
+                                    <td>5층 / 15층</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">방/욕실</th>
+                                    <td>3개 / 2개</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">입주일</th>
+                                    <td>즉시입주</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="border-bottom pb-2 mb-3">등록 사진 (2장)</h6>
+                        <div class="d-flex gap-2">
+                            <div
+                                style="width:80px; height:80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius:8px;">
+                            </div>
+                            <div
+                                style="width:80px; height:80px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius:8px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white d-flex justify-content-between py-3">
+                    <button class="btn btn-outline-secondary" onclick="prevStep(3)"><i
+                            class="bi bi-arrow-left me-1"></i> 이전</button>
+                    <button class="btn btn-success"><i class="bi bi-check-lg me-1"></i> 매물 등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function nextStep(step) {
+            document.querySelectorAll('[id^="step"]').forEach(el => el.classList.add('d-none'));
+            document.getElementById('step' + step).classList.remove('d-none');
+            updateIndicator(step);
+        }
+        function prevStep(step) {
+            document.querySelectorAll('[id^="step"]').forEach(el => el.classList.add('d-none'));
+            document.getElementById('step' + step).classList.remove('d-none');
+            updateIndicator(step);
+        }
+        function updateIndicator(currentStep) {
+            document.querySelectorAll('.step').forEach((el, idx) => {
+                el.classList.remove('active', 'completed');
+                if (idx + 1 < currentStep) el.classList.add('completed');
+                if (idx + 1 === currentStep) el.classList.add('active');
+            });
+        }
+        document.getElementById('transactionType').addEventListener('change', function () {
+            const type = this.value;
+            document.getElementById('salePriceGroup').style.display = type === '매매' ? 'block' : 'none';
+            document.getElementById('depositGroup').style.display = type !== '' ? 'block' : 'none';
+            document.getElementById('monthlyGroup').style.display = type === '월세' ? 'block' : 'none';
+        });
+    </script>
+</body>
+
+</html>

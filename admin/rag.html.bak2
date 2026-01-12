@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG 지식 창고 - 혜화72</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{--primary:#22c55e;--primary-dark:#16a34a;--bg-dark:#0f172a;--bg-card:#1e293b;--text-primary:#f8fafc;--text-muted:#94a3b8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);min-height:100vh;color:var(--text-primary)}
+.container-fluid{max-width:1400px;margin:0 auto;padding:30px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:16px}
+.back-btn{display:flex;align-items:center;gap:8px;color:var(--text-muted);text-decoration:none}
+.back-btn:hover{color:#fff}
+.page-title{display:flex;align-items:center;gap:12px;font-size:1.5rem;font-weight:700}
+.title-icon{width:48px;height:48px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.status-badge{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:20px;font-size:.85rem}
+.status-badge.online{background:rgba(34,197,94,.2);color:#22c55e}
+.status-badge.offline{background:rgba(239,68,68,.2);color:#ef4444}
+.status-badge.checking{background:rgba(234,179,8,.2);color:#eab308}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px}
+.stat-card{background:var(--bg-card);border-radius:12px;padding:20px;text-align:center;transition:transform .2s}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-value{font-size:2rem;font-weight:700;color:var(--primary)}
+.stat-label{font-size:.85rem;color:var(--text-muted);margin-top:4px}
+.main-grid{display:grid;grid-template-columns:1fr 400px;gap:24px}
+.card{background:var(--bg-card);border-radius:16px;border:none}
+.card-header{background:none;border-bottom:1px solid #334155;padding:20px 24px;font-weight:600;display:flex;align-items:center;justify-content:space-between;color:var(--text-primary)}
+.card-header-left{display:flex;align-items:center;gap:10px}
+.card-header i{color:var(--primary)}
+.card-body{padding:24px}
+.namespace-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.namespace-tab{background:#334155;border:none;color:var(--text-muted);padding:10px 20px;border-radius:10px;font-size:.9rem;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s}
+.namespace-tab:hover{background:#475569;color:#fff}
+.namespace-tab.active{background:var(--primary);color:#fff}
+.namespace-tab .count{background:rgba(0,0,0,.2);padding:2px 8px;border-radius:10px;font-size:.75rem}
+.search-box{display:flex;gap:12px;margin-bottom:20px}
+.search-input{flex:1;background:#0f172a;border:1px solid #334155;color:#fff;border-radius:10px;padding:12px 16px}
+.search-input:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px rgba(34,197,94,.2)}
+.search-input::placeholder{color:#64748b}
+.btn-search{background:var(--primary);border:none;color:#fff;padding:12px 20px;border-radius:10px;display:flex;align-items:center;gap:8px;transition:all .2s}
+.btn-search:hover{background:var(--primary-dark);color:#fff}
+.doc-list{max-height:500px;overflow-y:auto}
+.doc-item{background:#0f172a;border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s;border:1px solid transparent}
+.doc-item:hover{border-color:var(--primary);transform:translateX(4px)}
+.doc-item.selected{border-color:var(--primary);background:rgba(34,197,94,.1)}
+.doc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.doc-category{background:rgba(59,130,246,.2);color:#3b82f6;padding:2px 10px;border-radius:10px;font-size:.75rem;font-weight:500}
+.doc-id{font-size:.7rem;color:var(--text-muted);background:#334155;padding:2px 8px;border-radius:4px}
+.doc-title{font-weight:600;margin-bottom:6px;font-size:.95rem}
+.doc-preview{font-size:.85rem;color:var(--text-muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.doc-meta{display:flex;gap:12px;margin-top:10px;font-size:.75rem;color:var(--text-muted)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.empty-state i{font-size:4rem;margin-bottom:16px;opacity:.3}
+.detail-panel{display:none}
+.detail-panel.active{display:block}
+.detail-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+.detail-badges{display:flex;gap:8px;flex-wrap:wrap}
+.detail-content{background:#0f172a;border-radius:12px;padding:20px;white-space:pre-wrap;line-height:1.8;font-size:.9rem;max-height:350px;overflow-y:auto}
+.detail-actions{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.btn-action{flex:1;min-width:100px;background:#334155;border:none;color:#fff;padding:12px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:.9rem;transition:all .2s}
+.btn-action:hover{background:#475569;color:#fff}
+.btn-action.danger{background:#dc2626}
+.btn-action.danger:hover{background:#b91c1c}
+.btn-action.primary{background:var(--primary)}
+.btn-action.primary:hover{background:var(--primary-dark)}
+.api-links{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin-top:20px}
+.api-links-title{color:var(--primary);font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:.9rem}
+.api-link{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#0f172a;border-radius:8px;margin-bottom:8px;font-size:.85rem;color:var(--text-muted);text-decoration:none;transition:all .2s}
+.api-link:hover{background:#1e293b;color:#fff}
+.api-link i{color:var(--primary)}
+.score-badge{background:rgba(234,179,8,.2);color:#eab308;padding:2px 8px;border-radius:10px;font-size:.7rem}
+@media(max-width:1200px){.main-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.stats-grid{grid-template-columns:1fr}.header{justify-content:center;text-align:center}}
+</style>
+</head>
+<body>
+<div class="container-fluid">
+<header class="header">
+<a href="content-studio.html" class="back-btn"><i class="bi bi-arrow-left"></i> 콘텐츠 제작소</a>
+<div class="page-title"><div class="title-icon"><i class="bi bi-database"></i></div>RAG 지식 창고</div>
+<div class="status-badge checking" id="serverStatus"><i class="bi bi-circle-fill"></i> 연결 확인중...</div>
+</header>
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-value" id="totalDocs">-</div><div class="stat-label">전체 지식</div></div>
+<div class="stat-card"><div class="stat-value" id="namespaceCount">-</div><div class="stat-label">네임스페이스</div></div>
+<div class="stat-card"><div class="stat-value" id="realestateDocs">-</div><div class="stat-label">부동산</div></div>
+<div class="stat-card"><div class="stat-value" id="shortsDocs">-</div><div class="stat-label">숏츠</div></div>
+</div>
+<div class="main-grid">
+<div class="card">
+<div class="card-header">
+<div class="card-header-left"><i class="bi bi-folder2-open"></i> 저장된 지식</div>
+<button class="btn-search" onclick="loadNamespaces()"><i class="bi bi-arrow-clockwise"></i> 새로고침</button>
+</div>
+<div class="card-body">
+<div class="namespace-tabs" id="namespaceTabs"><button class="namespace-tab active" onclick="selectNamespace('all')"><i class="bi bi-collection"></i> 전체</button></div>
+<div class="search-box">
+<input type="text" class="search-input" id="searchQuery" placeholder="지식 검색 (의미 기반 유사도 검색)..." onkeypress="if(event.key==='Enter')searchDocuments()">
+<button class="btn-search" onclick="searchDocuments()"><i class="bi bi-search"></i> 검색</button>
+</div>
+<div class="doc-list" id="docList"><div class="empty-state"><i class="bi bi-hourglass-split"></i><p>데이터를 불러오는 중...</p></div></div>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><div class="card-header-left"><i class="bi bi-info-circle"></i> 상세 정보</div></div>
+<div class="card-body" id="infoPanel">
+<div class="empty-state" style="padding:40px"><i class="bi bi-hand-index"></i><p>왼쪽 목록에서<br>문서를 선택하세요</p></div>
+<div class="api-links">
+<div class="api-links-title"><i class="bi bi-link-45deg"></i> 관련 링크</div>
+<a href="https://api.hyehwa72.org/docs#/RAG" target="_blank" class="api-link"><i class="bi bi-file-code"></i> RAG API 문서</a>
+<a href="https://n8n.hyehwa72.org/form/rag-upload-form" target="_blank" class="api-link"><i class="bi bi-cloud-upload"></i> n8n 지식 업로드 폼</a>
+<a href="content-studio.html" class="api-link"><i class="bi bi-palette"></i> 콘텐츠 제작소</a>
+</div>
+</div>
+<div class="card-body detail-panel" id="detailPanel">
+<div class="detail-header">
+<div class="detail-badges">
+<span class="doc-category" id="detailNamespace">namespace</span>
+<span class="doc-category" id="detailCategory" style="background:rgba(168,85,247,.2);color:#a855f7">category</span>
+<span class="doc-id" id="detailId">ID: -</span>
+</div>
+<span class="doc-meta" id="detailDate">-</span>
+</div>
+<h5 id="detailTitle" style="margin-bottom:16px;font-size:1.1rem">문서 제목</h5>
+<div class="detail-content" id="detailContent">문서 내용이 여기에 표시됩니다.</div>
+<div class="detail-actions">
+<button class="btn-action" onclick="copyContent()"><i class="bi bi-clipboard"></i> 복사</button>
+<button class="btn-action primary" onclick="searchSimilar()"><i class="bi bi-search"></i> 유사 검색</button>
+<button class="btn-action" onclick="hideDetail()"><i class="bi bi-x-lg"></i> 닫기</button>
+<button class="btn-action danger" onclick="deleteDocument()"><i class="bi bi-trash"></i> 삭제</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+const API_BASE='https://api.hyehwa72.org/api/rag';
+let namespaces=[],documents=[],currentDocs=[],selectedDoc=null,currentNamespace='all';
+async function checkServer(){const badge=document.getElementById('serverStatus');badge.className='status-badge checking';badge.innerHTML='<i class="bi bi-circle-fill"></i> 연결 확인중...';try{const r=await fetch(API_BASE+'/namespaces');if(r.ok){badge.className='status-badge online';badge.innerHTML='<i class="bi bi-circle-fill"></i> 서버 정상';return true}throw new Error()}catch(e){badge.className='status-badge offline';badge.innerHTML='<i class="bi bi-circle-fill"></i> 서버 오프라인';return false}}
+async function loadNamespaces(){const online=await checkServer();if(!online){document.getElementById('docList').innerHTML='<div class="empty-state"><i class="bi bi-wifi-off"></i><p>서버에 연결할 수 없습니다</p></div>';return}try{const r=await fetch(API_BASE+'/namespaces');const data=await r.json();namespaces=data.namespaces||[];let total=0,re=0,sh=0;namespaces.forEach(ns=>{total+=ns.count;if(ns.namespace==='realestate')re=ns.count;if(ns.namespace==='shorts')sh=ns.count});document.getElementById('totalDocs').textContent=total;document.getElementById('namespaceCount').textContent=namespaces.length;document.getElementById('realestateDocs').textContent=re;document.getElementById('shortsDocs').textContent=sh;renderNamespaceTabs();loadDocuments()}catch(e){console.error(e)}}
+function renderNamespaceTabs(){const c=document.getElementById('namespaceTabs');let h='<button class="namespace-tab '+(currentNamespace==='all'?'active':'')+'" onclick="selectNamespace(\'all\')"><i class="bi bi-collection"></i> 전체</button>';namespaces.forEach(ns=>{const icon=ns.namespace==='realestate'?'bi-building':ns.namespace==='shorts'?'bi-play-circle':'bi-folder';h+='<button class="namespace-tab '+(currentNamespace===ns.namespace?'active':'')+'" onclick="selectNamespace(\''+ns.namespace+'\')"><i class="bi '+icon+'"></i> '+ns.namespace+' <span class="count">'+ns.count+'</span></button>'});c.innerHTML=h}
+function selectNamespace(ns){currentNamespace=ns;renderNamespaceTabs();loadDocuments()}
+async function loadDocuments(){const docList=document.getElementById('docList');docList.innerHTML='<div class="empty-state"><i class="bi bi-hourglass-split"></i><p>문서를 불러오는 중...</p></div>';try{let allDocs=[];if(currentNamespace==='all'){for(const ns of namespaces){const r=await fetch(API_BASE+'/list/'+ns.namespace+'?limit=100');if(r.ok){const data=await r.json();allDocs=allDocs.concat(data.items||[])}}}else{const r=await fetch(API_BASE+'/list/'+currentNamespace+'?limit=100');if(r.ok){const data=await r.json();allDocs=data.items||[]}}documents=allDocs.sort((a,b)=>b.id-a.id);currentDocs=documents;renderDocuments()}catch(e){console.error(e);docList.innerHTML='<div class="empty-state"><i class="bi bi-exclamation-triangle"></i><p>문서 로드 실패</p></div>'}}
+function renderDocuments(){const docList=document.getElementById('docList');if(currentDocs.length===0){docList.innerHTML='<div class="empty-state"><i class="bi bi-inbox"></i><p>저장된 지식이 없습니다</p></div>';return}docList.innerHTML=currentDocs.map((d,i)=>{const title=d.title||'제목 없음';const preview=d.preview||d.content?.substring(0,100)||'';const date=d.created_at?new Date(d.created_at).toLocaleDateString('ko-KR'):'-';const scoreHtml=d.score?'<span class="score-badge">유사도: '+(d.score*100).toFixed(1)+'%</span>':'';return'<div class="doc-item" onclick="selectDocument('+i+')"><div class="doc-header"><div style="display:flex;gap:8px;align-items:center"><span class="doc-category">'+(d.namespace||'-')+'</span><span class="doc-id">ID: '+(d.id||'-')+'</span>'+scoreHtml+'</div><span class="doc-meta">'+date+'</span></div><div class="doc-title">'+title+'</div><div class="doc-preview">'+preview+'</div><div class="doc-meta"><span><i class="bi bi-tag"></i> '+(d.category||'-')+'</span></div></div>'}).join('')}
+async function searchDocuments(){const query=document.getElementById('searchQuery').value.trim();if(!query){currentDocs=documents;renderDocuments();return}const docList=document.getElementById('docList');docList.innerHTML='<div class="empty-state"><i class="bi bi-search"></i><p>검색 중...</p></div>';try{const r=await fetch(API_BASE+'/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:query,namespace:currentNamespace==='all'?null:currentNamespace,top_k:10})});if(r.ok){const results=await r.json();currentDocs=results.results||results;renderDocuments()}else throw new Error()}catch(e){console.error(e);docList.innerHTML='<div class="empty-state"><i class="bi bi-exclamation-triangle"></i><p>검색 실패</p></div>'}}
+async function selectDocument(index){selectedDoc=currentDocs[index];if(selectedDoc.id){try{const r=await fetch(API_BASE+'/'+selectedDoc.id);if(r.ok){const fullDoc=await r.json();selectedDoc={...selectedDoc,...fullDoc}}}catch(e){}}document.querySelectorAll('.doc-item').forEach((el,i)=>el.classList.toggle('selected',i===index));document.getElementById('detailNamespace').textContent=selectedDoc.namespace||'-';document.getElementById('detailCategory').textContent=selectedDoc.category||'-';document.getElementById('detailId').textContent='ID: '+(selectedDoc.id||'-');document.getElementById('detailTitle').textContent=selectedDoc.title||'제목 없음';document.getElementById('detailDate').textContent=selectedDoc.created_at?new Date(selectedDoc.created_at).toLocaleString('ko-KR'):'-';document.getElementById('detailContent').textContent=selectedDoc.content||selectedDoc.preview||'내용 없음';document.getElementById('infoPanel').style.display='none';document.getElementById('detailPanel').classList.add('active')}
+function hideDetail(){selectedDoc=null;document.querySelectorAll('.doc-item').forEach(el=>el.classList.remove('selected'));document.getElementById('infoPanel').style.display='block';document.getElementById('detailPanel').classList.remove('active')}
+function copyContent(){if(!selectedDoc)return;navigator.clipboard.writeText(selectedDoc.content||selectedDoc.preview||'');alert('클립보드에 복사되었습니다!')}
+function searchSimilar(){if(!selectedDoc)return;document.getElementById('searchQuery').value=selectedDoc.title||'';searchDocuments()}
+async function deleteDocument(){if(!selectedDoc||!selectedDoc.id){alert('삭제할 문서를 선택해주세요');return}if(!confirm('정말 삭제하시겠습니까?\n\nID: '+selectedDoc.id+'\n제목: '+(selectedDoc.title||'제목 없음')))return;try{const r=await fetch(API_BASE+'/'+selectedDoc.id,{method:'DELETE'});if(r.ok){alert('삭제되었습니다!');hideDetail();loadNamespaces()}else{const err=await r.json();throw new Error(err.detail||'Delete failed')}}catch(e){alert('삭제 실패: '+e.message)}}
+loadNamespaces();
+</script>
+</body>
+</html>
+```
+
+## 3단계: 붙여넣기 후 이거 입력하고 Enter
+```

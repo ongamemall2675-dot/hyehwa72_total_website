@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웹훅 즐겨찾기 - 혜화72</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --blue: #3b82f6
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 30px
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color .2s
+        }
+
+        .back-btn:hover {
+            color: #fff
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.8rem;
+            font-weight: 700
+        }
+
+        .title-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid rgba(245, 158, 11, .2)
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .stat-label {
+            font-size: .9rem;
+            color: var(--text-muted);
+            margin-top: 8px
+        }
+
+        .webhook-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px
+        }
+
+        .webhook-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #334155;
+            transition: all .3s;
+            cursor: pointer;
+            position: relative
+        }
+
+        .webhook-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(245, 158, 11, .2)
+        }
+
+        .webhook-card.active {
+            border-color: var(--success);
+            box-shadow: 0 0 16px rgba(34, 197, 94, .3)
+        }
+
+        .webhook-status {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%
+        }
+
+        .webhook-status.active {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success)
+        }
+
+        .webhook-status.inactive {
+            background: #64748b
+        }
+
+        .webhook-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .webhook-badge {
+            font-size: .75rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: rgba(59, 130, 246, .2);
+            color: #3b82f6;
+            font-weight: 500
+        }
+
+        .webhook-url {
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin: 12px 0;
+            padding: 10px;
+            background: #0f172a;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            border: 1px solid #334155
+        }
+
+        .webhook-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            transition: all .2s;
+            font-size: .9rem
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px)
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #fff
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+            transform: translateY(-2px)
+        }
+
+        .btn-blue {
+            background: var(--blue);
+            color: #fff
+        }
+
+        .btn-blue:hover {
+            background: #2563eb;
+            transform: translateY(-2px)
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: #fff
+        }
+
+        .btn-secondary:hover {
+            background: #475569
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted)
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: .3
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+            animation: slideIn .3s
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success)
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger)
+        }
+
+        .toast-icon {
+            font-size: 1.2rem
+        }
+
+        .toast.success .toast-icon {
+            color: var(--success)
+        }
+
+        .toast.error .toast-icon {
+            color: var(--danger)
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all .2s;
+            font-size: .9rem
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary)
+        }
+
+        @media(max-width:768px) {
+            .stats {
+                grid-template-columns: 1fr
+            }
+
+            .webhook-grid {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="n8n-control.html" class="back-btn"><i class="bi bi-arrow-left"></i> n8n 제어 패널로</a>
+            <div class="page-title">
+                <div class="title-icon"><i class="bi bi-star-fill"></i></div>웹훅 즐겨찾기
+            </div>
+            <a href="https://n8n.hyehwa72.org" target="_blank" class="btn btn-primary" style="text-decoration:none"><i
+                    class="bi bi-box-arrow-up-right"></i> n8n 대시보드</a>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalBookmarks">0</div>
+                <div class="stat-label">즐겨찾기 웹훅</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeBookmarks">0</div>
+                <div class="stat-label">활성화</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="inactiveBookmarks">0</div>
+                <div class="stat-label">비활성화</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all" onclick="filterBookmarks('all')">전체</button>
+            <button class="filter-btn" data-filter="active" onclick="filterBookmarks('active')">활성화만</button>
+            <button class="filter-btn" data-filter="inactive" onclick="filterBookmarks('inactive')">비활성화만</button>
+        </div>
+
+        <div class="webhook-grid" id="webhookGrid">
+            <div class="empty-state">
+                <i class="bi bi-stars"></i>
+                <h3>즐겨찾기가 비어있습니다</h3>
+                <p>n8n 제어 패널에서 웹훅을 즐겨찾기에 추가해보세요!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const API_BASE = '/n8n-api/v1';
+        const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4OTY3ODUyYy0yNjE4LTQwMDUtYWIwNy0wMjlmZmNkZDYyZjYiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY2NzEzMzM0fQ.jQHqAw8b4Y1hUdPZbh2G2yPZjTgwKesB5Xl8wJy3CFw';
+        const headers = { 'X-N8N-API-KEY': API_KEY, 'Content-Type': 'application/json' };
+        let workflows = [];
+        let bookmarkedWorkflows = [];
+        let currentFilter = 'all';
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle'} toast-icon"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        async function loadBookmarkedWebhooks() {
+            const bookmarkIds = JSON.parse(localStorage.getItem('webhookBookmarks') || '[]');
+            if (bookmarkIds.length === 0) {
+                document.getElementById('webhookGrid').innerHTML = `
+<div class="empty-state">
+<i class="bi bi-stars"></i>
+<h3>즐겨찾기가 비어있습니다</h3>
+<p>n8n 제어 패널에서 웹훅을 즐겨찾기에 추가해보세요!</p>
+</div>`;
+                updateStats();
+                return;
+            }
+
+            try {
+                const r = await fetch(API_BASE + '/workflows', { headers });
+                if (r.ok) {
+                    const data = await r.json();
+                    workflows = data.data || [];
+                    bookmarkedWorkflows = workflows.filter(w => bookmarkIds.includes(w.id) && hasWebhookTrigger(w));
+                    updateStats();
+                    renderBookmarks();
+                } else throw new Error('Failed to load');
+            } catch (e) {
+                showToast('워크플로우를 불러올 수 없습니다', 'error');
+            }
+        }
+
+        function hasWebhookTrigger(w) {
+            if (!w.nodes) return false;
+            return w.nodes.some(n => n.type && n.type.toLowerCase().includes('webhook'));
+        }
+
+        function getWebhookUrl(w) {
+            const webhookNode = w.nodes?.find(n => n.type?.toLowerCase().includes('webhook'));
+            if (!webhookNode) return null;
+            const webhookPath = webhookNode.parameters?.path || webhookNode.webhookId || w.id;
+            return `https://admin.hyehwa72.org/n8n-webhook/${webhookPath}`;
+        }
+
+        function updateStats() {
+            const total = bookmarkedWorkflows.length;
+            const active = bookmarkedWorkflows.filter(w => w.active).length;
+            const inactive = total - active;
+            document.getElementById('totalBookmarks').textContent = total;
+            document.getElementById('activeBookmarks').textContent = active;
+            document.getElementById('inactiveBookmarks').textContent = inactive;
+        }
+
+        function renderBookmarks() {
+            let filtered = bookmarkedWorkflows;
+            if (currentFilter === 'active') filtered = bookmarkedWorkflows.filter(w => w.active);
+            else if (currentFilter === 'inactive') filtered = bookmarkedWorkflows.filter(w => !w.active);
+
+            if (filtered.length === 0) {
+                document.getElementById('webhookGrid').innerHTML = `
+<div class="empty-state">
+<i class="bi bi-inbox"></i>
+<h3>조건에 맞는 웹훅이 없습니다</h3>
+</div>`;
+                return;
+            }
+
+            document.getElementById('webhookGrid').innerHTML = filtered.map(w => {
+                const webhookUrl = getWebhookUrl(w);
+                const updated = w.updatedAt ? new Date(w.updatedAt).toLocaleDateString('ko-KR') : '';
+                return `
+<div class="webhook-card ${w.active ? 'active' : ''}">
+<div class="webhook-status ${w.active ? 'active' : 'inactive'}"></div>
+<div class="webhook-name">
+${w.name}
+<span class="webhook-badge">Webhook</span>
+</div>
+<div class="webhook-url" onclick="copyUrl('${webhookUrl}')" title="클릭하여 복사">
+${webhookUrl}
+</div>
+<div style="font-size:.8rem;color:var(--text-muted);margin-top:8px">
+<i class="bi bi-calendar"></i> ${updated}
+</div>
+<div class="webhook-actions">
+<button class="btn btn-success" onclick="executeWebhook('${w.id}')" ${w.active ? '' : 'disabled'}>
+<i class="bi bi-play-fill"></i> 실행
+</button>
+<button class="btn btn-blue" onclick="copyUrl('${webhookUrl}')">
+<i class="bi bi-clipboard"></i> URL 복사
+</button>
+<button class="btn btn-secondary" onclick="removeBookmark('${w.id}')">
+<i class="bi bi-star-fill"></i> 제거
+</button>
+</div>
+</div>`;
+            }).join('');
+        }
+
+        function filterBookmarks(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.filter-btn[data-filter="${filter}"]`).classList.add('active');
+            renderBookmarks();
+        }
+
+        async function copyUrl(url) {
+            try {
+                await navigator.clipboard.writeText(url);
+                showToast('URL이 복사되었습니다! 📋');
+            } catch (e) {
+                showToast('복사에 실패했습니다', 'error');
+            }
+        }
+
+        function removeBookmark(id) {
+            let bookmarks = JSON.parse(localStorage.getItem('webhookBookmarks') || '[]');
+            bookmarks = bookmarks.filter(bid => bid !== id);
+            localStorage.setItem('webhookBookmarks', JSON.stringify(bookmarks));
+            showToast('즐겨찾기에서 제거되었습니다');
+            loadBookmarkedWebhooks();
+        }
+
+        async function executeWebhook(id) {
+            const w = bookmarkedWorkflows.find(w => w.id === id);
+            if (!w) return;
+            const webhookNode = w.nodes?.find(n => n.type?.toLowerCase().includes('webhook'));
+            if (!webhookNode) { showToast('Webhook 노드를 찾을 수 없습니다', 'error'); return; }
+            let webhookPath = webhookNode.parameters?.path || webhookNode.parameters?.httpMethod?.path || webhookNode.webhookId || w.id;
+            if (webhookPath.startsWith('/')) webhookPath = webhookPath.substring(1);
+            const webhookUrl = `/n8n-webhook/${webhookPath}`;
+            try {
+                showToast('웹훅 실행 중...');
+                const r = await fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: 'favorites-page', timestamp: new Date().toISOString(), workflowId: w.id, workflowName: w.name }) });
+                if (r.ok) { showToast('웹훅이 실행되었습니다! ✅'); }
+                else { const errorText = await r.text(); throw new Error(`HTTP ${r.status}`); }
+            } catch (e) { showToast(`실행에 실패했습니다: ${e.message}`, 'error'); }
+        }
+
+        loadBookmarkedWebhooks();
+    </script>
+</body>
+
+</html>

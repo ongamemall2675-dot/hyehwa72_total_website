@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매물 관리 - 혜화72 부동산</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #1e1e2d;
+            --sidebar-hover: #2d2d3f;
+            --primary: #5c6bc0;
+            --text-muted: #a2a5b9;
+        }
+
+        * {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-brand-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-brand h5 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .sidebar-brand small {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .sidebar-nav {
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--sidebar-hover);
+            color: #fff;
+            border-left: 3px solid var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--sidebar-bg);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: #fff;
+            padding: 15px 25px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            font-weight: 600;
+        }
+
+        .nav-tabs .nav-link {
+            color: #6c757d;
+            border: none;
+            padding: 12px 20px;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            background: transparent;
+        }
+
+        .property-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .property-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .property-img {
+            height: 160px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 48px;
+        }
+
+        .property-body {
+            padding: 15px;
+        }
+
+        .property-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .property-title {
+            font-size: 14px;
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .property-info {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .badge-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .view-toggle .btn {
+            padding: 8px 15px;
+        }
+
+        .view-toggle .btn.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon"><i class="bi bi-building"></i></div>
+            <div>
+                <h5>혜화72</h5><small>부동산 관리시스템</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="bi bi-grid-1x2"></i> 대시보드</a>
+            <a href="ledger.html" class="nav-item"><i class="bi bi-journal-text"></i> 부동산 원장</a>
+            <a href="properties.html" class="nav-item active"><i class="bi bi-building"></i> 매물 관리</a>
+            <a href="customers.html" class="nav-item"><i class="bi bi-people"></i> 고객 관리</a>
+            <a href="requests.html" class="nav-item"><i class="bi bi-clipboard-check"></i> 의뢰 관리</a>
+            <a href="contracts.html" class="nav-item"><i class="bi bi-file-earmark-text"></i> 계약 관리</a>
+            <a href="schedules.html" class="nav-item"><i class="bi bi-calendar3"></i> 일정 관리</a>
+            <a href="settings.html" class="nav-item"><i class="bi bi-gear"></i> 설정</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar"><i class="bi bi-person"></i></div>
+                <div>
+                    <div style="font-weight: 600;">김훈</div><small style="color: var(--text-muted);">대학로혜화72</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <div class="topbar">
+            <h5 class="mb-0"><i class="bi bi-building me-2"></i>매물 관리</h5>
+            <a href="property-add.html" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>매물 등록
+            </a>
+        </div>
+
+        <div class="content">
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="주소/매물명 검색">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select">
+                                <option value="">물건유형</option>
+                                <option>아파트</option>
+                                <option>빌라</option>
+                                <option>오피스텔</option>
+                                <option>상가</option>
+                                <option>사무실</option>
+                                <option>원룸</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select">
+                                <option value="">거래유형</option>
+                                <option>매매</option>
+                                <option>전세</option>
+                                <option>월세</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select">
+                                <option value="">가격대</option>
+                                <option>1억 이하</option>
+                                <option>1억~3억</option>
+                                <option>3억~5억</option>
+                                <option>5억 이상</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>검색</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs & View Toggle -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <ul class="nav nav-tabs border-0">
+                    <li class="nav-item"><a class="nav-link active" href="#">전체 <span
+                                class="badge bg-secondary">13</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">활성 <span class="badge bg-success">8</span></a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="#">계약중 <span
+                                class="badge bg-warning text-dark">3</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">완료 <span class="badge bg-secondary">2</span></a>
+                    </li>
+                </ul>
+                <div class="view-toggle btn-group">
+                    <button class="btn btn-outline-secondary active"><i class="bi bi-grid-3x3-gap"></i></button>
+                    <button class="btn btn-outline-secondary"><i class="bi bi-list"></i></button>
+                </div>
+            </div>
+
+            <!-- Property Cards Grid -->
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <div class="property-card">
+                        <div class="property-img"><i class="bi bi-building"></i></div>
+                        <div class="property-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary badge-status">전세</span>
+                                <span class="badge bg-success badge-status">활성</span>
+                            </div>
+                            <div class="property-price">3억 5,000만</div>
+                            <div class="property-title">종로구 혜화동 아파트</div>
+                            <div class="property-info">
+                                <i class="bi bi-rulers me-1"></i>84㎡ ·
+                                <i class="bi bi-door-open me-1"></i>3룸 ·
+                                <i class="bi bi-building me-1"></i>5/15층
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm flex-grow-1"><i class="bi bi-eye"></i>
+                                    상세</button>
+                                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <div class="property-card">
+                        <div class="property-img"
+                            style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"><i
+                                class="bi bi-house"></i></div>
+                        <div class="property-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-success badge-status">매매</span>
+                                <span class="badge bg-success badge-status">활성</span>
+                            </div>
+                            <div class="property-price">5억 2,000만</div>
+                            <div class="property-title">성북구 동소문로 빌라</div>
+                            <div class="property-info">
+                                <i class="bi bi-rulers me-1"></i>62㎡ ·
+                                <i class="bi bi-door-open me-1"></i>2룸 ·
+                                <i class="bi bi-building me-1"></i>3/4층
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm flex-grow-1"><i class="bi bi-eye"></i>
+                                    상세</button>
+                                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <div class="property-card">
+                        <div class="property-img"
+                            style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"><i
+                                class="bi bi-shop"></i></div>
+                        <div class="property-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-warning text-dark badge-status">월세</span>
+                                <span class="badge bg-warning text-dark badge-status">계약중</span>
+                            </div>
+                            <div class="property-price">1,000/80만</div>
+                            <div class="property-title">대학로 상가 1층</div>
+                            <div class="property-info">
+                                <i class="bi bi-rulers me-1"></i>45㎡ ·
+                                <i class="bi bi-building me-1"></i>1/3층
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm flex-grow-1"><i class="bi bi-eye"></i>
+                                    상세</button>
+                                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <div class="property-card">
+                        <div class="property-img"
+                            style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"><i
+                                class="bi bi-door-closed"></i></div>
+                        <div class="property-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-warning text-dark badge-status">월세</span>
+                                <span class="badge bg-success badge-status">활성</span>
+                            </div>
+                            <div class="property-price">500/35만</div>
+                            <div class="property-title">혜화역 원룸</div>
+                            <div class="property-info">
+                                <i class="bi bi-rulers me-1"></i>18㎡ ·
+                                <i class="bi bi-door-open me-1"></i>1룸 ·
+                                <i class="bi bi-building me-1"></i>4/5층
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm flex-grow-1"><i class="bi bi-eye"></i>
+                                    상세</button>
+                                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <div class="property-card">
+                        <div class="property-img"
+                            style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"><i
+                                class="bi bi-building"></i></div>
+                        <div class="property-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary badge-status">전세</span>
+                                <span class="badge bg-success badge-status">활성</span>
+                            </div>
+                            <div class="property-price">2억 8,000만</div>
+                            <div class="property-title">명륜동 오피스텔</div>
+                            <div class="property-info">
+                                <i class="bi bi-rulers me-1"></i>56㎡ ·
+                                <i class="bi bi-door-open me-1"></i>1.5룸 ·
+                                <i class="bi bi-building me-1"></i>8/20층
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm flex-grow-1"><i class="bi bi-eye"></i>
+                                    상세</button>
+                                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <div class="property-card">
+                        <div class="property-img"
+                            style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);"><i
+                                class="bi bi-briefcase"></i></div>
+                        <div class="property-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-warning text-dark badge-status">월세</span>
+                                <span class="badge bg-secondary badge-status">완료</span>
+                            </div>
+                            <div class="property-price">2,000/120만</div>
+                            <div class="property-title">대학로 사무실</div>
+                            <div class="property-info">
+                                <i class="bi bi-rulers me-1"></i>85㎡ ·
+                                <i class="bi bi-building me-1"></i>3/6층
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm flex-grow-1"><i class="bi bi-eye"></i>
+                                    상세</button>
+                                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">다음</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

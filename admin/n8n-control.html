@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>n8n 제어 패널 - 혜화72</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --danger: #ef4444
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: var(--text-primary)
+        }
+
+        .container-fluid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none
+        }
+
+        .back-btn:hover {
+            color: #fff
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700
+        }
+
+        .title-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px
+        }
+
+        .btn-n8n {
+            background: var(--primary);
+            border: none;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-weight: 500
+        }
+
+        .btn-n8n:hover {
+            background: var(--primary-dark);
+            color: #fff
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 30px
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700
+        }
+
+        .stat-value.orange {
+            color: var(--primary)
+        }
+
+        .stat-value.green {
+            color: var(--success)
+        }
+
+        .stat-value.red {
+            color: var(--danger)
+        }
+
+        .stat-value.blue {
+            color: #3b82f6
+        }
+
+        .stat-label {
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin-top: 4px
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: none;
+            margin-bottom: 24px
+        }
+
+        .card-header {
+            background: none;
+            border-bottom: 1px solid #334155;
+            padding: 20px 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-primary)
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .card-header i {
+            color: var(--primary)
+        }
+
+        .card-body {
+            padding: 24px
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px
+        }
+
+        .filter-tab {
+            background: #334155;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: .85rem;
+            cursor: pointer
+        }
+
+        .filter-tab:hover,
+        .filter-tab.active {
+            background: var(--primary);
+            color: #fff
+        }
+
+        .workflow-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .workflow-item {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid transparent;
+            transition: all .2s
+        }
+
+        .workflow-item:hover {
+            border-color: #334155
+        }
+
+        .workflow-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        .workflow-status.active {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success)
+        }
+
+        .workflow-status.inactive {
+            background: #64748b
+        }
+
+        .workflow-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .workflow-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .workflow-name .badge {
+            font-size: .7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500
+        }
+
+        .workflow-name .badge.webhook {
+            background: rgba(59, 130, 246, .2);
+            color: #3b82f6
+        }
+
+        .workflow-name .badge.schedule {
+            background: rgba(139, 92, 246, .2);
+            color: #8b5cf6
+        }
+
+        .workflow-name .badge.manual {
+            background: rgba(100, 116, 139, .2);
+            color: #94a3b8
+        }
+
+        .workflow-meta {
+            font-size: .8rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 16px
+        }
+
+        .workflow-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0
+        }
+
+        .btn-action {
+            background: #334155;
+            border: none;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn-action:hover {
+            background: #475569
+        }
+
+        .btn-action.run {
+            background: var(--success)
+        }
+
+        .btn-action.run:hover {
+            background: #16a34a
+        }
+
+        .btn-action.run:disabled {
+            background: #334155;
+            cursor: not-allowed;
+            opacity: .5
+        }
+
+        .btn-action.copy {
+            background: #3b82f6
+        }
+
+        .btn-action.copy:hover {
+            background: #2563eb
+        }
+
+        .btn-action.bookmark {
+            background: #f59e0b
+        }
+
+        .btn-action.bookmark:hover {
+            background: #d97706
+        }
+
+        .btn-action.bookmark.active {
+            background: #d97706;
+            box-shadow: 0 0 8px var(--primary)
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            flex-shrink: 0
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #334155;
+            border-radius: 26px;
+            transition: .3s
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: .3s
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background: var(--success)
+        }
+
+        .toggle-switch input:checked+.toggle-slider:before {
+            transform: translateX(24px)
+        }
+
+        .execution-list {
+            max-height: 300px;
+            overflow-y: auto
+        }
+
+        .execution-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #334155
+        }
+
+        .execution-item:last-child {
+            border-bottom: none
+        }
+
+        .execution-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%
+        }
+
+        .execution-status.success {
+            background: var(--success)
+        }
+
+        .execution-status.error {
+            background: var(--danger)
+        }
+
+        .execution-status.running {
+            background: var(--primary);
+            animation: pulse 1s infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .5
+            }
+        }
+
+        .execution-info {
+            flex: 1
+        }
+
+        .execution-name {
+            font-size: .9rem;
+            font-weight: 500
+        }
+
+        .execution-time {
+            font-size: .75rem;
+            color: var(--text-muted)
+        }
+
+        .execution-duration {
+            font-size: .8rem;
+            color: var(--text-muted)
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted)
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: .3
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #334155;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+            animation: slideIn .3s
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success)
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger)
+        }
+
+        .toast-icon {
+            font-size: 1.2rem
+        }
+
+        .toast.success .toast-icon {
+            color: var(--success)
+        }
+
+        .toast.error .toast-icon {
+            color: var(--danger)
+        }
+
+        @media(max-width:1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        @media(max-width:768px) {
+            .stats-grid {
+                grid-template-columns: 1fr
+            }
+
+            .workflow-item {
+                flex-wrap: wrap
+            }
+
+            .workflow-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 12px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <header class="header">
+            <a href="portal.html" class="back-btn"><i class="bi bi-arrow-left"></i> 포털로 돌아가기</a>
+            <div class="page-title">
+                <div class="title-icon"><i class="bi bi-gear-wide-connected"></i></div>n8n 제어 패널
+            </div>
+            <div class="header-actions">
+                <a href="webhook-favorites.html" class="btn-n8n" style="background:#8b5cf6"><i
+                        class="bi bi-star-fill"></i> 웹훅 즐겨찾기</a>
+                <a href="https://n8n.hyehwa72.org" target="_blank" class="btn-n8n"><i
+                        class="bi bi-box-arrow-up-right"></i> n8n 대시보드</a>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value orange" id="totalWorkflows">-</div>
+                <div class="stat-label">전체 워크플로우</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value green" id="activeWorkflows">-</div>
+                <div class="stat-label">활성화</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value red" id="inactiveWorkflows">-</div>
+                <div class="stat-label">비활성화</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value blue" id="webhookWorkflows">-</div>
+                <div class="stat-label">Webhook 트리거</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-left"><i class="bi bi-diagram-3"></i> 워크플로우 목록</div>
+                <button class="btn-n8n" onclick="loadWorkflows()" style="padding:8px 16px;font-size:.9rem"><i
+                        class="bi bi-arrow-clockwise"></i> 새로고침</button>
+            </div>
+            <div class="card-body">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all" onclick="filterWorkflows('all')">전체</button>
+                    <button class="filter-tab" data-filter="active" onclick="filterWorkflows('active')">활성화</button>
+                    <button class="filter-tab" data-filter="inactive"
+                        onclick="filterWorkflows('inactive')">비활성화</button>
+                    <button class="filter-tab" data-filter="webhook"
+                        onclick="filterWorkflows('webhook')">Webhook</button>
+                    <button class="filter-tab" data-filter="schedule"
+                        onclick="filterWorkflows('schedule')">Schedule</button>
+                </div>
+                <div class="workflow-list" id="workflowList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>워크플로우를 불러오는 중...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-left"><i class="bi bi-clock-history"></i> 최근 실행 기록</div>
+                <span style="font-size:.85rem;color:var(--text-muted)">최근 10건</span>
+            </div>
+            <div class="card-body">
+                <div class="execution-list" id="executionList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>실행 기록을 불러오는 중...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const API_BASE = '/n8n-api/v1';
+        const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4OTY3ODUyYy0yNjE4LTQwMDUtYWIwNy0wMjlmZmNkZDYyZjYiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY2NzEzMzM0fQ.jQHqAw8b4Y1hUdPZbh2G2yPZjTgwKesB5Xl8wJy3CFw';
+        let workflows = [];
+        let currentFilter = 'all';
+
+        const headers = { 'X-N8N-API-KEY': API_KEY, 'Content-Type': 'application/json' };
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle'} toast-icon"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        async function loadWorkflows() {
+            document.getElementById('workflowList').innerHTML = '<div class="loading"><div class="spinner"></div><p>워크플로우를 불러오는 중...</p></div>';
+            try {
+                const r = await fetch(API_BASE + '/workflows', { headers });
+                if (r.ok) {
+                    const data = await r.json();
+                    workflows = data.data || [];
+                    updateStats();
+                    renderWorkflows();
+                    loadExecutions();
+                } else throw new Error('Failed');
+            } catch (e) {
+                document.getElementById('workflowList').innerHTML = '<div class="empty-state"><i class="bi bi-exclamation-triangle"></i><p>워크플로우를 불러올 수 없습니다</p></div>';
+            }
+        }
+
+        function updateStats() {
+            const total = workflows.length;
+            const active = workflows.filter(w => w.active).length;
+            const inactive = total - active;
+            const webhook = workflows.filter(w => hasWebhookTrigger(w)).length;
+            document.getElementById('totalWorkflows').textContent = total;
+            document.getElementById('activeWorkflows').textContent = active;
+            document.getElementById('inactiveWorkflows').textContent = inactive;
+            document.getElementById('webhookWorkflows').textContent = webhook;
+        }
+
+        function hasWebhookTrigger(w) {
+            if (!w.nodes) return false;
+            return w.nodes.some(n => n.type && (n.type.toLowerCase().includes('webhook') || n.type.toLowerCase().includes('chat')));
+        }
+
+        function hasScheduleTrigger(w) {
+            if (!w.nodes) return false;
+            return w.nodes.some(n => n.type && n.type.toLowerCase().includes('schedule'));
+        }
+
+        function getTriggerType(w) {
+            if (hasWebhookTrigger(w)) return 'webhook';
+            if (hasScheduleTrigger(w)) return 'schedule';
+            return 'manual';
+        }
+
+        function renderWorkflows() {
+            let filtered = workflows;
+            if (currentFilter === 'active') filtered = workflows.filter(w => w.active);
+            else if (currentFilter === 'inactive') filtered = workflows.filter(w => !w.active);
+            else if (currentFilter === 'webhook') filtered = workflows.filter(w => hasWebhookTrigger(w));
+            else if (currentFilter === 'schedule') filtered = workflows.filter(w => hasScheduleTrigger(w));
+
+            if (filtered.length === 0) {
+                document.getElementById('workflowList').innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>워크플로우가 없습니다</p></div>';
+                return;
+            }
+
+            document.getElementById('workflowList').innerHTML = filtered.map(w => {
+                const triggerType = getTriggerType(w);
+                const triggerLabels = { webhook: 'Webhook', schedule: 'Schedule', manual: 'Manual' };
+                const updated = w.updatedAt ? new Date(w.updatedAt).toLocaleDateString('ko-KR') : '';
+                const nodeCount = w.nodes ? w.nodes.length : 0;
+                const canRun = triggerType === 'webhook' && w.active;
+                const isBookmarked = isWebhookBookmarked(w.id);
+                const webhookUrl = canRun ? getWebhookUrl(w) : '';
+
+                return `<div class="workflow-item">
+<div class="workflow-status ${w.active ? 'active' : 'inactive'}"></div>
+<div class="workflow-info">
+<div class="workflow-name">${w.name}<span class="badge ${triggerType}">${triggerLabels[triggerType]}</span></div>
+<div class="workflow-meta"><span><i class="bi bi-boxes"></i> ${nodeCount}개 노드</span><span><i class="bi bi-calendar"></i> ${updated}</span></div>
+</div>
+<div class="workflow-actions">
+${canRun ? `<button class="btn-action copy" onclick="copyWebhookUrl('${w.id}')" title="Webhook URL 복사"><i class="bi bi-clipboard"></i></button>` : ''}
+${triggerType === 'webhook' ? `<button class="btn-action bookmark ${isBookmarked ? 'active' : ''}" onclick="toggleBookmark('${w.id}')" title="즐겨찾기 ${isBookmarked ? '제거' : '추가'}"><i class="bi ${isBookmarked ? 'bi-star-fill' : 'bi-star'}"></i></button>` : ''}
+<button class="btn-action run" onclick="executeWorkflow('${w.id}')" ${canRun ? '' : 'disabled'} title="${canRun ? '실행' : 'Webhook 활성화 필요'}"><i class="bi bi-play-fill"></i></button>
+<button class="btn-action" onclick="window.open('https://n8n.hyehwa72.org/workflow/${w.id}','_blank')" title="편집"><i class="bi bi-pencil"></i></button>
+<label class="toggle-switch" title="${w.active ? '비활성화' : '활성화'}">
+<input type="checkbox" ${w.active ? 'checked' : ''} onchange="toggleWorkflow('${w.id}',this.checked)">
+<span class="toggle-slider"></span>
+</label>
+</div>
+</div>`;
+            }).join('');
+        }
+
+        function filterWorkflows(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.filter-tab[data-filter="${filter}"]`).classList.add('active');
+            renderWorkflows();
+        }
+
+        async function toggleWorkflow(id, active) {
+            try {
+                const r = await fetch(API_BASE + `/workflows/${id}`, {
+                    method: 'PATCH',
+                    headers,
+                    body: JSON.stringify({ active })
+                });
+                if (r.ok) {
+                    showToast(active ? '워크플로우가 활성화되었습니다' : '워크플로우가 비활성화되었습니다');
+                    const w = workflows.find(w => w.id === id);
+                    if (w) w.active = active;
+                    updateStats();
+                    renderWorkflows();
+                } else throw new Error();
+            } catch (e) { showToast('상태 변경에 실패했습니다', 'error'); loadWorkflows(); }
+        }
+
+        function getWebhookUrl(w) {
+            const webhookNode = w.nodes?.find(n => n.type?.toLowerCase().includes('webhook'));
+            if (!webhookNode) return null;
+            const webhookPath = webhookNode.parameters?.path || webhookNode.webhookId || w.id;
+            return `https://admin.hyehwa72.org/n8n-webhook/${webhookPath}`;
+        }
+
+        async function copyWebhookUrl(id) {
+            const w = workflows.find(w => w.id === id);
+            if (!w) return;
+            const webhookUrl = getWebhookUrl(w);
+            if (!webhookUrl) {
+                showToast('Webhook URL을 찾을 수 없습니다', 'error');
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(webhookUrl);
+                showToast('Webhook URL이 복사되었습니다! 📋');
+            } catch (e) {
+                showToast('복사에 실패했습니다', 'error');
+            }
+        }
+
+        function isWebhookBookmarked(id) {
+            const bookmarks = JSON.parse(localStorage.getItem('webhookBookmarks') || '[]');
+            return bookmarks.includes(id);
+        }
+
+        function toggleBookmark(id) {
+            let bookmarks = JSON.parse(localStorage.getItem('webhookBookmarks') || '[]');
+            const index = bookmarks.indexOf(id);
+            if (index === -1) {
+                bookmarks.push(id);
+                showToast('즐겨찾기에 추가되었습니다 ⭐');
+            } else {
+                bookmarks.splice(index, 1);
+                showToast('즐겨찾기에서 제거되었습니다');
+            }
+            localStorage.setItem('webhookBookmarks', JSON.stringify(bookmarks));
+            renderWorkflows();
+        }
+
+        async function executeWorkflow(id) {
+            const w = workflows.find(w => w.id === id);
+            if (!w) return;
+            const webhookNode = w.nodes?.find(n => n.type?.toLowerCase().includes('webhook'));
+            if (!webhookNode) {
+                showToast('Webhook 노드를 찾을 수 없습니다', 'error');
+                return;
+            }
+            // Try multiple methods to get webhook path
+            let webhookPath = webhookNode.parameters?.path ||
+                webhookNode.parameters?.httpMethod?.path ||
+                webhookNode.webhookId ||
+                w.id;
+
+            // Clean up the path
+            if (webhookPath.startsWith('/')) {
+                webhookPath = webhookPath.substring(1);
+            }
+
+            const webhookUrl = `/n8n-webhook/${webhookPath}`;
+            console.log('Executing webhook:', webhookUrl);
+
+            try {
+                showToast('워크플로우 실행 중...');
+                const r = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        source: 'admin-panel',
+                        timestamp: new Date().toISOString(),
+                        workflowId: w.id,
+                        workflowName: w.name
+                    })
+                });
+                if (r.ok) {
+                    showToast('워크플로우가 실행되었습니다! ✅');
+                    setTimeout(loadExecutions, 2000);
+                } else {
+                    const errorText = await r.text();
+                    console.error('Webhook execution failed:', r.status, errorText);
+                    throw new Error(`HTTP ${r.status}`);
+                }
+            } catch (e) {
+                showToast(`실행에 실패했습니다: ${e.message}`, 'error');
+                console.error('Webhook execution error:', e);
+            }
+        }
+
+        async function loadExecutions() {
+            try {
+                const r = await fetch(API_BASE + '/executions?limit=10', { headers });
+                if (r.ok) {
+                    const data = await r.json();
+                    const executions = data.data || [];
+                    renderExecutions(executions);
+                }
+            } catch (e) { document.getElementById('executionList').innerHTML = '<div class="empty-state"><i class="bi bi-clock"></i><p>실행 기록을 불러올 수 없습니다</p></div>'; }
+        }
+
+        function renderExecutions(executions) {
+            if (executions.length === 0) {
+                document.getElementById('executionList').innerHTML = '<div class="empty-state"><i class="bi bi-clock"></i><p>실행 기록이 없습니다</p></div>';
+                return;
+            }
+            document.getElementById('executionList').innerHTML = executions.map(e => {
+                const status = e.finished ? (e.status === 'success' || e.status === 'running' ? 'success' : 'error') : 'running';
+                const statusText = { success: '성공', error: '실패', running: '실행 중' };
+                const startTime = e.startedAt ? new Date(e.startedAt).toLocaleString('ko-KR') : '';
+                const duration = e.stoppedAt && e.startedAt ? ((new Date(e.stoppedAt) - new Date(e.startedAt)) / 1000).toFixed(1) + '초' : '';
+                const wfName = e.workflowData?.name || e.workflowId || 'Unknown';
+                return `<div class="execution-item">
+<div class="execution-status ${status}"></div>
+<div class="execution-info">
+<div class="execution-name">${wfName}</div>
+<div class="execution-time">${startTime}</div>
+</div>
+<div class="execution-duration">${duration || statusText[status]}</div>
+</div>`;
+            }).join('');
+        }
+
+        loadWorkflows();
+    </script>
+</body>
+
+</html>
